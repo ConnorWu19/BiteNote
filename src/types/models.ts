@@ -34,6 +34,10 @@ export type DishCategory =
   | '亞洲美饌'
   | '咖啡廳甜點'
   | '手搖飲料'
+  | '早午餐輕食'
+  | '餐酒宵夜'
+  | '健康蔬食'
+  | '吃到飽'
   | '招牌主食'
   | '單點小菜'
   | '湯品鍋物'
@@ -142,6 +146,10 @@ export const DISH_CATEGORIES: DishCategory[] = [
   '亞洲美饌',
   '咖啡廳甜點',
   '手搖飲料',
+  '早午餐輕食',
+  '餐酒宵夜',
+  '健康蔬食',
+  '吃到飽',
 ];
 
 export interface PhotoFilterMeta {
