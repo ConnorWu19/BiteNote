@@ -103,6 +103,17 @@ export default function App() {
   const [lightboxLog, setLightboxLog] = useState<BiteLog | null>(null);
   const [toastMessage, setToastMessage] = useState<string>('');
 
+  // 今日手帳日期標記（動態根據訪客當日換算，呈現質樸手帳印記）
+  const todayDateStr = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const date = now.getDate();
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const day = weekdays[now.getDay()];
+    return `${year} 年 ${month} 月 ${date} 日・週${day}`;
+  }, []);
+
   // 開啟相片全螢幕放大燈箱（嚴格鎖定同一家店、同一個品項之歷次品嚐紀錄，左右滑動僅在同品項各次回訪照片切換）
   const openPhotoLightbox = (dish: EnrichedDish, log?: BiteLog) => {
     setLightboxDish(dish);
@@ -556,8 +567,8 @@ export default function App() {
         </View>
       ) : null}
 
-      {/* 頂部雜誌感品牌刊頭 (Masthead Header) — 精簡清爽，主導覽移至底部固定導覽列 */}
-      <View style={[styles.masthead, { borderBottomColor: colors.border }]}>
+      {/* 頂部雜誌感品牌刊頭 (Masthead Header) — 平衡典雅、雙側呼應、不再留白失重 */}
+      <View style={[styles.masthead, { borderBottomColor: colors.border, backgroundColor: colors.canvas }]}>
         <View style={styles.mastheadTopRow}>
           <Pressable
             accessibilityRole="button"
@@ -565,10 +576,16 @@ export default function App() {
             onPress={() => setActiveTab('home')}
             style={styles.logoRow}
           >
+            <View style={[styles.logoStamp, { backgroundColor: colors.accent }]}>
+              <Text style={styles.logoStampText}>噛</Text>
+            </View>
             <View style={styles.brandTextCol}>
               <View style={styles.brandTitleRow}>
                 <Text style={[styles.brandTitleEn, { color: colors.ink }]}>BiteNote</Text>
                 <Text style={[styles.brandTitleZh, { color: colors.accent }]}>吃一口</Text>
+                <View style={[styles.brandIssueBadge, { backgroundColor: colors.accentSoft }]}>
+                  <Text style={[styles.brandIssueBadgeText, { color: colors.accent }]}>私密手帳</Text>
+                </View>
               </View>
               <Text
                 numberOfLines={1}
@@ -580,14 +597,18 @@ export default function App() {
           </Pressable>
 
           <View style={styles.utilityBtnsRow}>
-            {activeTab !== 'home' && activeTab !== 'profile' && (
+            {activeTab !== 'profile' && (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="快速記一口"
                 onPress={() => openComposerForPlace(activePlace?.id)}
-                style={[
+                style={({ pressed }) => [
                   styles.compactUtilityBtn,
-                  { backgroundColor: colors.accent, borderColor: colors.accent },
+                  {
+                    backgroundColor: colors.accent,
+                    borderColor: colors.accent,
+                    opacity: pressed ? 0.85 : 1,
+                  },
                 ]}
               >
                 <Text style={[styles.compactUtilityBtnText, { color: '#FFFFFF' }]}>
@@ -621,14 +642,18 @@ export default function App() {
          * ================================================================= */}
         {activeTab === 'home' && (
           <View style={styles.homeTabContainer}>
-            {/* 1. 主頁快速行動主卡 (Hero Quick Action Card) */}
+            {/* 1. 現代飲食手帳刊頭主舞台 (Editorial Gastronomy Journal Hero & Action Hub) */}
             <View
               style={[
-                styles.homeHeroCard,
-                { backgroundColor: colors.surface, borderColor: colors.border },
+                styles.homeHeroContainer,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
               ]}
             >
-              <View style={styles.homeHeroHeader}>
+              {/* 刊頭上方：日期與手帳記號 */}
+              <View style={styles.homeHeroKickerRow}>
                 <View
                   style={[
                     styles.homeHeroKickerPill,
@@ -636,19 +661,25 @@ export default function App() {
                   ]}
                 >
                   <Text style={[styles.homeHeroKickerText, { color: colors.accent }]}>
-                    ✦ 今日私密味覺手札
+                    ✦ 舌尖歲月手札
                   </Text>
                 </View>
-                <Text style={[styles.homeHeroTitle, { color: colors.ink }]}>
-                  今天吃了什麼令人難忘的味道？
+                <Text style={[styles.homeHeroDateText, { color: colors.inkMuted }]}>
+                  {todayDateStr}
                 </Text>
-                <Text style={[styles.homeHeroSub, { color: colors.inkSecondary }]}>
-                  拍下剛上桌的食物照片、記下當下價格與真實評分。同品項第 2 次、第 3 次回訪會自動比對評分起伏與漲價軌跡。
-                </Text>
-
-                
               </View>
 
+              {/* 核心文案：大器自信的襯線體標題與優雅導言 */}
+              <View style={styles.homeHeroContent}>
+                <Text style={[styles.homeHeroTitle, { color: colors.ink }]}>
+                  用舌尖記錄每一筆歲月
+                </Text>
+                <Text style={[styles.homeHeroSub, { color: colors.inkSecondary }]}>
+                  真誠寫下每道味道的當下感受、價格與評分，為每一次回訪留下真實軌跡。
+                </Text>
+              </View>
+
+              {/* 核心行動列：主次分明，去除括號冗贅文案 */}
               <View style={styles.homeHeroActionsRow}>
                 <Pressable
                   accessibilityRole="button"
@@ -658,12 +689,13 @@ export default function App() {
                     styles.homePrimaryCta,
                     {
                       backgroundColor: colors.accent,
-                      opacity: pressed ? 0.88 : 1,
+                      opacity: pressed ? 0.9 : 1,
+                      transform: [{ scale: pressed ? 0.985 : 1 }],
                     },
                   ]}
                 >
                   <Text style={styles.homePrimaryCtaText}>
-                    📷 ＋ 記一口（上傳美食與評分）
+                    📷 ＋ 記一口新味道
                   </Text>
                 </Pressable>
 
@@ -676,7 +708,8 @@ export default function App() {
                     {
                       backgroundColor: colors.surfaceSubtle,
                       borderColor: colors.border,
-                      opacity: pressed ? 0.85 : 1,
+                      opacity: pressed ? 0.88 : 1,
+                      transform: [{ scale: pressed ? 0.985 : 1 }],
                     },
                   ]}
                 >
@@ -684,96 +717,85 @@ export default function App() {
                     📍 連結新店家
                   </Text>
                 </Pressable>
-
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="開啟過往吃過的美食地圖"
-                  onPress={() => setActiveTab('map')}
-                  style={({ pressed }) => [
-                    styles.homeSecondaryCta,
-                    {
-                      backgroundColor: colors.surfaceSubtle,
-                      borderColor: colors.border,
-                      opacity: pressed ? 0.85 : 1,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.homeSecondaryCtaText, { color: colors.ink }]}>
-                    🗺️ 美食地圖
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-
-            {/* 2. 個人味覺統計票根橫條（點擊可跳轉至對應分頁） */}
-            <View style={styles.homeSectionBlock}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
-                  個人味覺統計摘要
-                </Text>
-                <Text style={[styles.sectionHeaderSub, { color: colors.inkMuted }]}>
-                  點選數字可前往該分頁
-                </Text>
               </View>
 
+              {/* 一體化味覺票根條 (Integrated Tasting Ledger Strip) */}
               <View
                 style={[
-                  styles.insightRibbon,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  styles.homeLedgerStrip,
+                  {
+                    borderTopColor: colors.border,
+                    backgroundColor: colors.surfaceSubtle,
+                  },
                 ]}
               >
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`前往店家名冊，共 ${insights.totalPlaces} 家私藏店家`}
+                  accessibilityLabel={`前往店家名冊，共 ${insights.totalPlaces} 家`}
                   onPress={() => {
                     setVerdictFilter('all');
                     setPlaceSubView('directory');
                     setActiveTab('places');
                   }}
-                  style={styles.insightItem}
+                  style={({ pressed }) => [
+                    styles.homeLedgerItem,
+                    { opacity: pressed ? 0.75 : 1 },
+                  ]}
                 >
-                  <Text style={[styles.insightNum, { color: colors.ink }]}>
+                  <Text style={[styles.homeLedgerNum, { color: colors.ink }]}>
                     {insights.totalPlaces}
                   </Text>
-                  <Text style={[styles.insightLabel, { color: colors.inkSecondary }]}>
-                    已紀錄店家 ›
+                  <Text style={[styles.homeLedgerLabel, { color: colors.inkSecondary }]}>
+                    已記店家 ›
                   </Text>
                 </Pressable>
-                <View style={[styles.insightDivider, { backgroundColor: colors.border }]} />
+
+                <View style={[styles.homeLedgerDivider, { backgroundColor: colors.border }]} />
+
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`前往評分漲跌，共 ${insights.totalDishes} 道記錄品項`}
+                  accessibilityLabel={`前往評分漲跌，共 ${insights.totalDishes} 道`}
                   onPress={() => {
                     setVerdictFilter('all');
                     setActiveTab('evolution');
                   }}
-                  style={styles.insightItem}
+                  style={({ pressed }) => [
+                    styles.homeLedgerItem,
+                    { opacity: pressed ? 0.75 : 1 },
+                  ]}
                 >
-                  <Text style={[styles.insightNum, { color: colors.ink }]}>
+                  <Text style={[styles.homeLedgerNum, { color: colors.ink }]}>
                     {insights.totalDishes}
                   </Text>
-                  <Text style={[styles.insightLabel, { color: colors.inkSecondary }]}>
+                  <Text style={[styles.homeLedgerLabel, { color: colors.inkSecondary }]}>
                     記錄品項 ›
                   </Text>
                 </Pressable>
-                <View style={[styles.insightDivider, { backgroundColor: colors.border }]} />
+
+                <View style={[styles.homeLedgerDivider, { backgroundColor: colors.border }]} />
+
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`前往拍立得日記，累計吃一口 ${insights.totalBites} 次`}
+                  accessibilityLabel={`前往拍立得日記，累計 ${insights.totalBites} 次`}
                   onPress={() => {
                     setVerdictFilter('all');
                     setActiveTab('timeline');
                   }}
-                  style={styles.insightItem}
+                  style={({ pressed }) => [
+                    styles.homeLedgerItem,
+                    { opacity: pressed ? 0.75 : 1 },
+                  ]}
                 >
-                  <Text style={[styles.insightNum, { color: colors.accent }]}>
+                  <Text style={[styles.homeLedgerNum, { color: colors.accent }]}>
                     {insights.totalBites}
                   </Text>
-                  <Text style={[styles.insightLabel, { color: colors.inkSecondary }]}>
-                    累計吃一口 ›
+                  <Text style={[styles.homeLedgerLabel, { color: colors.inkSecondary }]}>
+                    累計品嚐 ›
                   </Text>
                 </Pressable>
-                <View style={[styles.insightDivider, { backgroundColor: colors.border }]} />
+
+                <View style={[styles.homeLedgerDivider, { backgroundColor: colors.border }]} />
+
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={`查看漲價品項，共 ${insights.priceUpDishesCount} 道`}
@@ -781,28 +803,39 @@ export default function App() {
                     setVerdictFilter('price_up');
                     setActiveTab('evolution');
                   }}
-                  style={styles.insightItem}
+                  style={({ pressed }) => [
+                    styles.homeLedgerItem,
+                    { opacity: pressed ? 0.75 : 1 },
+                  ]}
                 >
-                  <Text style={[styles.insightNum, { color: colors.priceUp }]}>
+                  <Text style={[styles.homeLedgerNum, { color: colors.priceUp }]}>
                     {insights.priceUpDishesCount}
                   </Text>
-                  <Text style={[styles.insightLabel, { color: colors.inkSecondary }]}>
-                    漲價品項 ›
+                  <Text style={[styles.homeLedgerLabel, { color: colors.inkSecondary }]}>
+                    漲價觀察 ›
                   </Text>
                 </Pressable>
               </View>
             </View>
 
-            {/* 3. 味覺演變焦點（必回訪最高分 & 漲價警示精選） */}
+            {/* 2. 舌尖演變亮點（必回訪最高分 & 漲價警示精選） */}
             {(spotlightEncoreDish || spotlightPriceUpDish) && (
               <View style={styles.homeSectionBlock}>
                 <View style={styles.sectionHeaderRow}>
-                  <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
-                    舌尖演變焦點
-                  </Text>
-                  <Pressable onPress={() => setActiveTab('evolution')}>
+                  <View style={styles.sectionHeaderLeft}>
+                    <Text style={[styles.sectionHeaderIcon, { color: colors.accent }]}>✦</Text>
+                    <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
+                      舌尖演變亮點
+                    </Text>
+                  </View>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="查看全部評分漲跌"
+                    onPress={() => setActiveTab('evolution')}
+                    style={styles.sectionHeaderActionBtn}
+                  >
                     <Text style={[styles.sectionHeaderAction, { color: colors.accent }]}>
-                      查看全部評分漲跌 →
+                      完整走勢曲線 →
                     </Text>
                   </Pressable>
                 </View>
@@ -810,10 +843,16 @@ export default function App() {
                 <View style={[styles.spotlightRow, isWideScreen && styles.spotlightRowWide]}>
                   {spotlightEncoreDish && (
                     <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`查看私藏最高評價品項：${spotlightEncoreDish.name}`}
                       onPress={() => navigateToPlaceDetail(spotlightEncoreDish.placeId)}
-                      style={[
+                      style={({ pressed }) => [
                         styles.spotlightCard,
-                        { backgroundColor: colors.surface, borderColor: colors.border },
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          opacity: pressed ? 0.9 : 1,
+                        },
                       ]}
                     >
                       <View style={styles.spotlightBadgeRow}>
@@ -824,17 +863,20 @@ export default function App() {
                           ]}
                         >
                           <Text style={[styles.spotlightBadgeText, { color: colors.herb }]}>
-                            🔥 私藏最高評價
+                            🔥 值得再訪
                           </Text>
                         </View>
                         <Text style={[styles.spotlightPlace, { color: colors.inkSecondary }]}>
-                          📍 {spotlightEncoreDish.placeName}
+                          📍 {spotlightEncoreDish.placeName} →
                         </Text>
                       </View>
                       <Text style={[styles.spotlightDishTitle, { color: colors.ink }]}>
                         {spotlightEncoreDish.name}
                       </Text>
-                      <Text style={[styles.spotlightDesc, { color: colors.inkSecondary }]}>
+                      <Text
+                        numberOfLines={2}
+                        style={[styles.spotlightDesc, { color: colors.inkSecondary }]}
+                      >
                         {spotlightEncoreDish.evolutionSummary}
                       </Text>
                     </Pressable>
@@ -842,10 +884,16 @@ export default function App() {
 
                   {spotlightPriceUpDish && (
                     <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`查看漲價品項：${spotlightPriceUpDish.name}`}
                       onPress={() => navigateToPlaceDetail(spotlightPriceUpDish.placeId)}
-                      style={[
+                      style={({ pressed }) => [
                         styles.spotlightCard,
-                        { backgroundColor: colors.surface, borderColor: colors.border },
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          opacity: pressed ? 0.9 : 1,
+                        },
                       ]}
                     >
                       <View style={styles.spotlightBadgeRow}>
@@ -856,17 +904,20 @@ export default function App() {
                           ]}
                         >
                           <Text style={[styles.spotlightBadgeText, { color: colors.priceUp }]}>
-                            💸 漲價幅度顯著
+                            💸 漲價觀察
                           </Text>
                         </View>
                         <Text style={[styles.spotlightPlace, { color: colors.inkSecondary }]}>
-                          📍 {spotlightPriceUpDish.placeName}
+                          📍 {spotlightPriceUpDish.placeName} →
                         </Text>
                       </View>
                       <Text style={[styles.spotlightDishTitle, { color: colors.ink }]}>
                         {spotlightPriceUpDish.name}
                       </Text>
-                      <Text style={[styles.spotlightDesc, { color: colors.inkSecondary }]}>
+                      <Text
+                        numberOfLines={2}
+                        style={[styles.spotlightDesc, { color: colors.inkSecondary }]}
+                      >
                         {spotlightPriceUpDish.evolutionSummary}
                       </Text>
                     </Pressable>
@@ -875,15 +926,23 @@ export default function App() {
               </View>
             )}
 
-            {/* 4. 最近吃一口紀錄（精選最新 4 筆，保持主頁清爽） */}
+            {/* 3. 最新品嚐手帳（精選最新 4 筆） */}
             <View style={styles.homeSectionBlock}>
               <View style={styles.sectionHeaderRow}>
-                <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
-                  最近吃一口紀錄
-                </Text>
-                <Pressable onPress={() => setActiveTab('timeline')}>
+                <View style={styles.sectionHeaderLeft}>
+                  <Text style={[styles.sectionHeaderIcon, { color: colors.accent }]}>📸</Text>
+                  <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
+                    最新品嚐紀錄
+                  </Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`查看全部日記`}
+                  onPress={() => setActiveTab('timeline')}
+                  style={styles.sectionHeaderActionBtn}
+                >
                   <Text style={[styles.sectionHeaderAction, { color: colors.accent }]}>
-                    查看全部日記 ({insights.totalBites}) →
+                    查看全部手帳 ({insights.totalBites}) →
                   </Text>
                 </Pressable>
               </View>
@@ -1048,45 +1107,19 @@ export default function App() {
               )}
             </View>
 
-            {/* 5. 底部引導卡片：引導前往獨立的「🗺️ 店家名冊」分頁 */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="前往店家名冊分頁查看所有紀錄過的店家"
-              onPress={() => {
-                setPlaceSubView('directory');
-                setActiveTab('places');
-              }}
-              style={[
-                styles.placesDirectoryBanner,
-                { backgroundColor: colors.surfaceSubtle, borderColor: colors.borderStrong },
-              ]}
-            >
-              <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-                <Text style={[styles.placesDirectoryBannerTitle, { color: colors.ink }]}>
-                  🗺️ 紀錄過的店家名冊（共 {insights.totalPlaces} 家）
+            {/* 4. 手帳底部的精緻手帳印記與快捷指引 */}
+            <View style={[styles.homeColophon, { borderTopColor: colors.border }]}>
+              <View style={styles.homeColophonBrandRow}>
+                <View style={[styles.homeColophonDot, { backgroundColor: colors.accent }]} />
+                <Text style={[styles.homeColophonBrandText, { color: colors.inkSecondary }]}>
+                  BiteNote 吃一口・舌尖私密手帳
                 </Text>
-                <Text
-                  style={[styles.placesDirectoryBannerSub, { color: colors.inkSecondary }]}
-                >
-                  所有已連結的店家、私密備忘與店內各品項圖表已收納在「店家名冊」分頁，讓主頁保持清爽！
-                </Text>
+                <View style={[styles.homeColophonDot, { backgroundColor: colors.accent }]} />
               </View>
-              <View
-                style={[
-                  styles.placesDirectoryBannerBtn,
-                  { backgroundColor: colors.ink },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.placesDirectoryBannerBtnText,
-                    { color: colors.canvas },
-                  ]}
-                >
-                  前往查看 →
-                </Text>
-              </View>
-            </Pressable>
+              <Text style={[styles.homeColophonQuote, { color: colors.inkMuted }]}>
+                「每一口真實味道，都是舌尖與歲月的私密對話。」
+              </Text>
+            </View>
           </View>
         )}
 
@@ -2068,16 +2101,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
   },
   logoStampText: {
     color: '#FFFFFF',
-    fontSize: 11,
+    fontSize: 18,
     fontWeight: '900',
+    fontFamily: FONTS.serif,
     letterSpacing: 0.5,
   },
   brandTitleRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     flexWrap: 'wrap',
     gap: 6,
   },
@@ -2092,6 +2131,18 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontFamily: FONTS.serif,
   },
+  brandIssueBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: RADIUS.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandIssueBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
   brandSubtitle: {
     fontSize: 11.5,
     lineHeight: 15,
@@ -2101,18 +2152,20 @@ const styles = StyleSheet.create({
   utilityBtnsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     flexShrink: 0,
   },
   compactUtilityBtn: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   compactUtilityBtnText: {
-    fontSize: 11.5,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
   },
   mainScroll: {
     flex: 1,
@@ -2131,18 +2184,21 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: SPACING.lg,
   },
-  homeHeroCard: {
+  homeHeroContainer: {
     width: '100%',
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    padding: SPACING.lg,
-    gap: SPACING.md,
+    overflow: 'hidden',
   },
-  homeHeroHeader: {
+  homeHeroKickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
     gap: 8,
   },
   homeHeroKickerPill: {
-    alignSelf: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: RADIUS.pill,
@@ -2152,30 +2208,43 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.4,
   },
+  homeHeroDateText: {
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: FONTS.mono,
+  },
+  homeHeroContent: {
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.xs,
+    gap: 8,
+  },
   homeHeroTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
     fontFamily: FONTS.serif,
-    lineHeight: 30,
+    lineHeight: 32,
+    letterSpacing: -0.3,
   },
   homeHeroSub: {
     fontSize: 13.5,
-    lineHeight: 20,
+    lineHeight: 21,
     fontFamily: FONTS.sans,
   },
-  
   homeHeroActionsRow: {
     width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginTop: 2,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xs,
+    paddingBottom: SPACING.lg,
   },
   homePrimaryCta: {
-    flex: 1.6,
-    minWidth: 200,
+    flex: 1.4,
+    minWidth: 180,
     paddingVertical: 13,
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     borderRadius: RADIUS.pill,
     alignItems: 'center',
     justifyContent: 'center',
@@ -2184,12 +2253,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
+    letterSpacing: 0.2,
   },
   homeSecondaryCta: {
     flex: 1,
     minWidth: 130,
     paddingVertical: 13,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
     alignItems: 'center',
@@ -2199,92 +2269,48 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     fontWeight: '700',
   },
-  homeAuthBanner: {
+  homeLedgerStrip: {
     width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderRadius: RADIUS.lg,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    gap: 12,
+    borderTopWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 6,
   },
-  homeAuthBannerLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    minWidth: 0,
-  },
-  homeAuthBadgeIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: RADIUS.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  homeAuthBadgeIconText: {
-    fontSize: 18,
-  },
-  homeAuthBannerMeta: {
+  homeLedgerItem: {
     flex: 1,
     minWidth: 0,
+    alignItems: 'center',
+    paddingVertical: 3,
   },
-  homeAuthBannerTitle: {
-    fontFamily: FONTS.sans,
-    fontSize: 13.5,
+  homeLedgerDivider: {
+    width: 1,
+    marginVertical: 4,
+  },
+  homeLedgerNum: {
+    fontSize: 21,
+    fontWeight: '900',
+    fontFamily: FONTS.mono,
+  },
+  homeLedgerLabel: {
+    fontSize: 11,
     fontWeight: '700',
-    marginBottom: 2,
-  },
-  homeAuthBannerDesc: {
-    fontFamily: FONTS.sans,
-    fontSize: 11.5,
-    lineHeight: 16,
-  },
-  homeAuthBannerPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: RADIUS.pill,
-    flexShrink: 0,
-  },
-  homeAuthBannerPillText: {
-    fontFamily: FONTS.sans,
-    fontSize: 11.5,
-    fontWeight: '700',
+    marginTop: 3,
   },
   homeSectionBlock: {
     width: '100%',
     gap: SPACING.sm,
   },
-  insightRibbon: {
-    width: '100%',
+  sectionHeaderLeft: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: RADIUS.lg,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-  },
-  insightItem: {
-    flex: 1,
-    minWidth: 0,
     alignItems: 'center',
-    paddingVertical: 2,
+    gap: 6,
   },
-  insightDivider: {
-    width: 1,
-    marginVertical: 4,
+  sectionHeaderIcon: {
+    fontSize: 13,
   },
-  insightNum: {
-    fontSize: 20,
-    fontWeight: '900',
-    fontFamily: FONTS.mono,
-  },
-  insightLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    marginTop: 3,
+  sectionHeaderActionBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
   spotlightRow: {
     width: '100%',
@@ -2428,6 +2454,36 @@ const styles = StyleSheet.create({
   },
   recentLogNote: {
     fontSize: 12,
+  },
+  homeColophon: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.md,
+    gap: 6,
+    borderTopWidth: 1,
+    marginTop: SPACING.sm,
+  },
+  homeColophonBrandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  homeColophonDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+  },
+  homeColophonBrandText: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  homeColophonQuote: {
+    fontSize: 11.5,
+    fontFamily: FONTS.serif,
+    fontStyle: 'italic',
   },
   placesDirectoryBanner: {
     width: '100%',
