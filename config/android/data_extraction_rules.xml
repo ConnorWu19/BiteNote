@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BiteNote 吃一口 — Android 12+ (API 31+) Google Drive 雲端自動備份與換機轉移規則
+  完整涵蓋 SQLite 資料庫與應用程式內部食物相片
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="." />
+        <include domain="file" path="SQLite" />
+        <include domain="file" path="photos" />
+        <include domain="sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="." />
+        <include domain="file" path="SQLite" />
+        <include domain="file" path="photos" />
+        <include domain="sharedpref" path="." />
+    </device-transfer>
+</data-extraction-rules>

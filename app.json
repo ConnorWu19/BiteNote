@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "BiteNote 吃一口",
+    "slug": "bitenote",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "bitenote",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#D14830"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bitenote.app",
+      "infoPlist": {
+        "UIFileSharingEnabled": true,
+        "LSSupportsOpeningDocumentsInPlace": true,
+        "NSPhotoLibraryUsageDescription": "「BiteNote 吃一口」需要讀取您的相簿，讓您挑選並記錄每一次品嚐的美食照片。",
+        "NSPhotoLibraryAddUsageDescription": "「BiteNote 吃一口」需要儲存照片至您的相簿，以便透過 iCloud 自動備份您的美食照片。",
+        "NSCameraUsageDescription": "「BiteNote 吃一口」需要使用相機，讓您隨手拍下眼前的料理並寫進手帳。",
+        "NSLocationWhenInUseUsageDescription": "「BiteNote 吃一口」需要取得您的位置，以便快速連結附近的餐廳與私房小店。"
+      }
+    },
+    "android": {
+      "package": "com.bitenote.app",
+      "allowBackup": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#D14830"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "BiteNote 吃一口",
+      "shortName": "吃一口",
+      "lang": "zh-TW",
+      "display": "standalone",
+      "backgroundColor": "#FAF6F0",
+      "themeColor": "#D14830"
+    },
+    "plugins": [
+      "./plugins/withNativeBackup.js",
+      "expo-sqlite"
+    ]
+  }
+}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>隱私權政策 (Privacy Policy) — BiteNote 吃一口</title>
+  <meta name="description" content="BiteNote 吃一口 美食手帳 App 隱私權政策與資料安全承諾。本機優先、零第三方追蹤、守護您的每一道味覺回憶。">
+  <link rel="icon" type="image/png" href="./assets/favicon.png">
+  <style>
+    :root {
+      --bg-canvas: #FAF6F0;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F3ECE2;
+      --color-ink: #2B2825;
+      --color-secondary: #766E65;
+      --color-muted: #A39B91;
+      --color-accent: #D14830;
+      --color-border: #E8DFD3;
+      --color-card-border: rgba(209, 72, 48, 0.12);
+      --font-serif: "Noto Serif TC", "Songti TC", "Source Han Serif TC", Georgia, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--color-ink);
+      font-family: var(--font-sans);
+      line-height: 1.75;
+      padding: 32px 16px 80px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* 頂部刊頭 */
+    header {
+      text-align: center;
+      padding: 40px 0 32px 0;
+      border-bottom: 2px solid var(--color-border);
+      margin-bottom: 40px;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .brand-mark .en {
+      color: var(--color-ink);
+    }
+
+    .brand-mark .zh {
+      color: var(--color-accent);
+      background: rgba(209, 72, 48, 0.08);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--color-ink);
+      margin-top: 12px;
+      margin-bottom: 8px;
+      font-family: var(--font-serif);
+    }
+
+    .meta-date {
+      font-size: 14px;
+      color: var(--color-secondary);
+    }
+
+    /* 核心精要徽章卡 */
+    .highlight-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 16px rgba(43, 40, 37, 0.04);
+    }
+
+    .highlight-card h3 {
+      font-size: 16px;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .highlight-card p {
+      font-size: 15px;
+      color: var(--color-ink);
+      margin: 0;
+    }
+
+    /* 內文段落 */
+    section {
+      background: var(--bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(43, 40, 37, 0.02);
+    }
+
+    h2 {
+      font-size: 20px;
+      color: var(--color-ink);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--bg-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-serif);
+    }
+
+    p {
+      margin-bottom: 14px;
+      font-size: 15px;
+      color: #3C3733;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-bottom: 14px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: #3C3733;
+    }
+
+    strong {
+      color: var(--color-ink);
+      font-weight: 600;
+    }
+
+    .permission-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--bg-subtle);
+      color: var(--color-accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 6px;
+      border: 1px solid var(--color-border);
+    }
+
+    /* 頁尾 */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--color-border);
+      font-size: 13px;
+      color: var(--color-muted);
+    }
+
+    footer a {
+      color: var(--color-secondary);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 12px 60px 12px;
+      }
+      section {
+        padding: 20px 18px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand-mark">
+        <span class="en">BiteNote</span>
+        <span class="zh">吃一口</span>
+      </div>
+      <h1>隱私權政策 (Privacy Policy)</h1>
+      <div class="meta-date">生效日期：2026 年 10 月 23 日・版本：1.0</div>
+    </header>
+
+    <div class="highlight-card">
+      <h3>🔒 核心承諾：零第三方追蹤、本機優先、資料屬於您自己</h3>
+      <p>
+        「BiteNote 吃一口」恪守極簡純淨原則。<strong>我們沒有中央伺服器儲存您的私密照片或日記，所有用餐紀錄、評價、照片皆儲存在您的裝置本地端。</strong>除非您主動使用個人 iCloud 或 Google Drive 備份，否則您的任何資料絕不會離開您的手機。
+      </p>
+    </div>
+
+    <section>
+      <h2>1. 我們存取的裝置權限與用途</h2>
+      <p>為了提供完整的手帳紀錄與地圖瀏覽體驗，「BiteNote 吃一口」會在必要時向您徵詢以下裝置權限，每一項權限僅在您使用該項功能時於本機運作：</p>
+      <ul>
+        <li>
+          <span class="permission-badge">相機 Camera</span>
+          <strong>拍攝料理與菜單：</strong>僅在您點擊「隨手拍」時啟動相機，用於即時捕捉眼前的美食，相片直接儲存於您手機的本機沙盒空間。
+        </li>
+        <li>
+          <span class="permission-badge">相簿 Photo Library</span>
+          <strong>挑選歷史美食照片：</strong>僅在您主動由相簿中挑選照片寫入手帳時讀取。我們絕不會在背景掃描或讀取您未選取的其他私人照片。
+        </li>
+        <li>
+          <span class="permission-badge">位置資訊 Location</span>
+          <strong>地圖餐廳標記與附近店家：</strong>僅在您瀏覽「過往吃過的美食地圖」或紀錄新店家時，於裝置端取得單次座標以協助標註位置。<strong>我們絕不進行背景常駐追蹤（No Background Tracking），亦不儲存任何行蹤軌跡。</strong>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. 資料儲存與傳輸安全</h2>
+      <p>
+        <strong>本機 SQLite 儲存架構：</strong><br>
+        您的品項紀錄、演變圖表、價格走勢與筆記心得，一律加密存放在裝置本機的高效 SQLite 資料庫中。我們不維護任何儲存使用者個人日記的外部商業資料庫。
+      </p>
+      <p>
+        <strong>開放地圖圖資調用：</strong><br>
+        App 內的地圖功能採用公開標準圖資（如臺灣通用電子地圖 WMTS 服務），僅在前端下載公開圖磚瓦片（Tiles），過程中完全不傳輸您的個人識別資訊。
+      </p>
+    </section>
+
+    <section>
+      <h2>3. 雲端備份機制</h2>
+      <p>
+        若您啟用系統的備份功能（如 iOS iCloud 備份或 Android Google Drive 自動備份）：
+      </p>
+      <ul>
+        <li>備份檔案直接由作業系統傳輸至您個人的私有雲端帳號中。</li>
+        <li>BiteNote 開發團隊無權、亦無法存取、調閱或解密您儲存於個人雲端的備份內容。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. 零廣告與不向第三方揭露</h2>
+      <p>
+        <strong>我們承諾：</strong>
+      </p>
+      <ul>
+        <li>絕不出售、租賃或交換任何使用者的個人資料。</li>
+        <li>未整合任何第三方商業行為追蹤 SDK（例如 Facebook Pixel 或侵犯隱私的廣告追蹤器）。</li>
+        <li>絕不跨應用程式追蹤您的網路瀏覽習慣。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>5. 使用者權利與資料刪除 (Data Deletion)</h2>
+      <p>
+        您對自己的每一筆美食紀錄享有 100% 的絕對掌控權：
+      </p>
+      <ul>
+        <li><strong>單筆刪除：</strong>在店家詳情或品項檢視中，您可以隨時長按或點選刪除單筆紀錄或照片。</li>
+        <li><strong>完整清空：</strong>在 App 的「備份與系統設定」選單中，提供「清空所有資料」功能，點擊後會立即自您的手機永久抹除所有手帳與快取，不留任何痕跡。</li>
+        <li><strong>解除安裝：</strong>若您從手機中刪除本 App，裝置上的所有本機資料庫檔案將隨之由作業系統自動銷毀。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. 兒童隱私保護 (Children's Privacy)</h2>
+      <p>
+        「BiteNote 吃一口」為通用型飲食記錄工具，不包含任何暴力、露骨或不當內容，亦不刻意收集 13 歲（或當地法規規定年齡）以下兒童的個人識別資訊。
+      </p>
+    </section>
+
+    <section>
+      <h2>7. 政策修訂與聯絡方式</h2>
+      <p>
+        本隱私權政策若有任何更新，將公布於本網頁並於 App 更新說明中註明。若您對本隱私權政策有任何疑問、建議或需要協助，歡迎隨時透過下方電子信箱與我們聯繫：
+      </p>
+      <p style="margin-top: 12px; font-weight: 600;">
+        電子信箱：<a href="mailto:support@bitenote.app" style="color: var(--color-accent); text-decoration: none;">support@bitenote.app</a>
+      </p>
+    </section>
+
+    <footer>
+      <p>© 2026 BiteNote 吃一口. All Rights Reserved.</p>
+      <p style="margin-top: 4px;">守護純淨的飲食手帳記憶・無負擔的離線本機體驗</p>
+    </footer>
+  </div>
+</body>
+</html>

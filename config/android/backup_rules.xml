@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BiteNote 吃一口 — Android 系統自動備份規則 (Android 11 及以下)
+  確保 SQLite 資料庫 (database) 與內部食物相片目錄 (file/photos) 完整備份至 Google Drive
+-->
+<full-backup-content>
+    <include domain="database" path="." />
+    <include domain="file" path="SQLite" />
+    <include domain="file" path="photos" />
+    <include domain="sharedpref" path="." />
+</full-backup-content>
