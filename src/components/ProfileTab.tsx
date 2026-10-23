@@ -500,7 +500,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="開啟完整備份與同步設定"
+            accessibilityLabel="開啟手帳備份與自訂設定"
             onPress={onOpenBackupModal}
             style={({ pressed }) => [
               styles.linkButton,
@@ -508,7 +508,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             ]}
           >
             <Text style={[styles.linkButtonText, { color: colors.herb }]}>
-              完整設定 ❯
+              自訂與完整設定 ❯
             </Text>
           </Pressable>
         </View>
@@ -637,101 +637,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
       </View>
 
       {/* =====================================================================
-       * 區塊 4：開發者憑證與第三方 API (Developer Credentials & Status)
-       * =================================================================== */}
-      <View
-        style={[
-          styles.card,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}
-      >
-        <View style={styles.cardHeaderRow}>
-          <Text style={[styles.cardTitle, { color: colors.ink }]}>
-            🔑 第三方服務與憑證狀態
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="開啟 API 設定"
-            onPress={onOpenBackupModal}
-            style={({ pressed }) => [
-              styles.linkButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
-          >
-            <Text style={[styles.linkButtonText, { color: colors.accent }]}>
-              自訂設定 ❯
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.credentialList}>
-          <View style={[styles.credentialItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.credLeftCol}>
-              <Text style={[styles.credName, { color: colors.ink }]}>
-                Google OAuth Web Client ID
-              </Text>
-              <Text style={[styles.credStatus, { color: colors.inkMuted }]}>
-                {settings.googleClientId ? '已手動配置自訂用戶端' : '已啟用系統預設官方 Client ID'}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusPill,
-                { backgroundColor: colors.herbSoft, borderColor: colors.herb },
-              ]}
-            >
-              <Text style={[styles.statusPillText, { color: colors.herb }]}>
-                運作中
-              </Text>
-            </View>
-          </View>
-
-          <View style={[styles.credentialItem, { borderBottomColor: colors.border }]}>
-            <View style={styles.credLeftCol}>
-              <Text style={[styles.credName, { color: colors.ink }]}>
-                Apple Sign In Service ID
-              </Text>
-              <Text style={[styles.credStatus, { color: colors.inkMuted }]}>
-                {settings.appleServiceId || 'com.bitenote.web (預設服務代號)'}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusPill,
-                { backgroundColor: colors.surfaceSubtle, borderColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.statusPillText, { color: colors.inkSecondary }]}>
-                已就緒
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.credentialItem}>
-            <View style={styles.credLeftCol}>
-              <Text style={[styles.credName, { color: colors.ink }]}>
-                Google Maps JavaScript API
-              </Text>
-              <Text style={[styles.credStatus, { color: colors.inkMuted }]}>
-                {settings.googleMapsApiKey ? '已自訂個人地圖金鑰' : '開放展示圖資與 Google 官方導航'}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.statusPill,
-                { backgroundColor: colors.herbSoft, borderColor: colors.herb },
-              ]}
-            >
-              <Text style={[styles.statusPillText, { color: colors.herb }]}>
-                已連接
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* =====================================================================
-       * 區塊 5：法律聲明、隱私權政策與致謝
+       * 區塊 4：法律聲明、隱私權政策與致謝
        * =================================================================== */}
       <View style={styles.legalSection}>
         <Text style={[styles.legalBrandTitle, { color: colors.ink }]}>
@@ -1077,39 +983,6 @@ const styles = StyleSheet.create({
   smallActionButtonText: {
     fontSize: 12.5,
     fontWeight: '600',
-  },
-  credentialList: {
-    gap: 0,
-  },
-  credentialItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    gap: 12,
-  },
-  credLeftCol: {
-    flex: 1,
-    gap: 2,
-  },
-  credName: {
-    fontSize: 13,
-    fontWeight: '600',
-    fontFamily: FONTS.mono,
-  },
-  credStatus: {
-    fontSize: 11.5,
-  },
-  statusPill: {
-    borderWidth: 1,
-    borderRadius: RADIUS.pill,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  statusPillText: {
-    fontSize: 11,
-    fontWeight: '700',
   },
   legalSection: {
     alignItems: 'center',
