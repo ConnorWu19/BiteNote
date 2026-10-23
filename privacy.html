@@ -44,9 +44,9 @@
     /* 頂部刊頭 */
     header {
       text-align: center;
-      padding: 40px 0 32px 0;
+      padding: 40px 0 28px 0;
       border-bottom: 2px solid var(--color-border);
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
 
     .brand-mark {
@@ -85,6 +85,37 @@
     .meta-date {
       font-size: 14px;
       color: var(--color-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* 導覽列標籤切換 */
+    .nav-tabs {
+      display: inline-flex;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: 30px;
+      gap: 4px;
+      border: 1px solid var(--color-border);
+    }
+
+    .nav-tab {
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-secondary);
+      text-decoration: none;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab:hover {
+      color: var(--color-ink);
+    }
+
+    .nav-tab.active {
+      background: var(--bg-surface);
+      color: var(--color-accent);
+      box-shadow: 0 2px 6px rgba(43, 40, 37, 0.06);
     }
 
     /* 核心精要徽章卡 */
@@ -214,6 +245,10 @@
       </div>
       <h1>隱私權政策 (Privacy Policy)</h1>
       <div class="meta-date">生效日期：2026 年 10 月 23 日・版本：1.0</div>
+      <div class="nav-tabs">
+        <a href="./privacy.html" class="nav-tab active">隱私權政策 (Privacy)</a>
+        <a href="./terms.html" class="nav-tab">服務條款 (Terms)</a>
+      </div>
     </header>
 
     <div class="highlight-card">
@@ -309,6 +344,9 @@
     <footer>
       <p>© 2026 BiteNote 吃一口. All Rights Reserved.</p>
       <p style="margin-top: 4px;">守護純淨的飲食手帳記憶・無負擔的離線本機體驗</p>
+      <p style="margin-top: 8px;">
+        <a href="./privacy.html">隱私權政策</a> ｜ <a href="./terms.html">服務條款</a>
+      </p>
     </footer>
   </div>
 </body>
