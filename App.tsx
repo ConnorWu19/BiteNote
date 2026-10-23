@@ -2010,6 +2010,11 @@ export default function App() {
         visible={authModalVisible}
         currentUser={settings.userProfile}
         colors={colors}
+        settings={settings}
+        onUpdateSettings={(partial) => {
+          const next = { ...settings, ...partial };
+          persistAll(places, dishes, biteLogs, next);
+        }}
         onClose={() => setAuthModalVisible(false)}
         onOpenPrivacy={() => openPolicyLink('privacy')}
         onOpenTerms={() => openPolicyLink('terms')}

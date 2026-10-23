@@ -51,6 +51,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultCurrency: 'NT$',
   lastBackupAt: new Date().toISOString(),
   userProfile: DEFAULT_USER_PROFILE,
+  googleClientId: '',
+  appleServiceId: '',
 };
 
 export interface AppDatabaseState {

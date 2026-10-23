@@ -282,6 +282,8 @@ export interface AppSettings {
   defaultCurrency: string;          // 預設幣別（NT$）
   lastBackupAt?: string;            // 最近一次備份時間
   userProfile?: UserProfile;        // 使用者登入個人檔案
+  googleClientId?: string;          // 選填：自備 Google OAuth 2.0 Web Client ID
+  appleServiceId?: string;          // 選填：自備 Apple Sign In Service ID
 }
 
 export interface BackupPayload {

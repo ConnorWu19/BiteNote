@@ -11,6 +11,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -21,7 +22,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { AuthProviderType, UserProfile } from '../types/models';
+import { AuthProviderType, AppSettings, UserProfile } from '../types/models';
+import { signInWithGoogle, signInWithApple, loadGoogleSdk, loadAppleSdk } from '../services/oauth';
 import { FONTS, RADIUS, SPACING, ThemeColors } from '../theme/theme';
 import { TASTE_QUOTES } from './SplashScreen';
 
@@ -29,6 +31,8 @@ export interface AuthModalProps {
   visible: boolean;
   currentUser?: UserProfile | null;
   colors: ThemeColors;
+  settings?: AppSettings;
+  onUpdateSettings?: (partial: Partial<AppSettings>) => void;
   onClose: () => void;
   onLoginSuccess: (user: UserProfile) => void;
   onLogout: () => void;
@@ -41,6 +45,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   visible,
   currentUser,
   colors,
+  settings,
+  onUpdateSettings,
   onClose,
   onLoginSuccess,
   onLogout,
@@ -54,6 +60,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [otpCode, setOtpCode] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
+  // OAuth 憑證輸入與設定
+  const [showConfigProvider, setShowConfigProvider] = useState<'google' | 'apple' | null>(null);
+  const [clientIdInput, setClientIdInput] = useState<string>('');
+
+  // 預先載入 Google 與 Apple Web SDK
+  useEffect(() => {
+    if (visible && Platform.OS === 'web') {
+      loadGoogleSdk().catch(() => {});
+      loadAppleSdk().catch(() => {});
+    }
+    if (visible) {
+      setShowConfigProvider(null);
+      setClientIdInput('');
+    }
+  }, [visible]);
+
 
   // 隨機飲食心語（每次開啟登入畫面自動隨機換一句，不支援手動切換）
   const [randomQuote, setRandomQuote] = useState<string>(() => {
@@ -89,48 +111,92 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onClose();
   };
 
-  // 1. 快速透過 Apple 登入
-  const handleAppleSignIn = () => {
+  // 1. 透過 Apple 登入（支援官方真實授權與自備憑證）
+  const handleAppleSignIn = async (overrideId?: string) => {
+    const activeServiceId = (overrideId || clientIdInput || settings?.appleServiceId || '').trim();
+    if (!activeServiceId) {
+      setShowConfigProvider('apple');
+      setClientIdInput(settings?.appleServiceId || '');
+      setAuthError('請填寫 Apple Service ID（或點擊下方一鍵體驗登入）');
+      return;
+    }
+
+    if (overrideId && onUpdateSettings) {
+      onUpdateSettings({ appleServiceId: overrideId });
+    }
+
     setIsSubmitting(true);
     setAuthError('');
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const appleUser: UserProfile = {
-        id: `apple_${Date.now().toString(36)}`,
-        name: 'Apple Taste Member',
-        email: 'taster@icloud.com',
-        avatarEmoji: '🍎',
-        provider: 'apple',
-        isGuest: false,
-        joinedAt: new Date().toISOString().split('T')[0],
-        lastSyncedAt: new Date().toISOString(),
-      };
+    try {
+      const appleUser = await signInWithApple(activeServiceId);
       onLoginSuccess(appleUser);
-      onShowToast('✓ 已成功透過 Apple ID 登入 BiteNote');
+      onShowToast(`✓ 已成功透過 Apple ID 登入：${appleUser.name}`);
       handleClose();
-    }, 450);
+    } catch (err: any) {
+      if (err.message === 'MISSING_SERVICE_ID') {
+        setShowConfigProvider('apple');
+        setAuthError('請填寫 Apple Service ID（或點擊下方一鍵體驗登入）');
+      } else {
+        setAuthError(err.message || 'Apple 登入失敗或已取消');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // 2. 快速透過 Google 登入
-  const handleGoogleSignIn = () => {
+  // 2. 透過 Google 帳號登入（支援 Google Identity Services 官方彈窗授權）
+  const handleGoogleSignIn = async (overrideId?: string) => {
+    const activeClientId = (overrideId || clientIdInput || settings?.googleClientId || '').trim();
+    if (!activeClientId) {
+      setShowConfigProvider('google');
+      setClientIdInput(settings?.googleClientId || '');
+      setAuthError('請填寫 Google OAuth 2.0 Web Client ID（或點擊下方一鍵體驗登入）');
+      return;
+    }
+
+    if (overrideId && onUpdateSettings) {
+      onUpdateSettings({ googleClientId: overrideId });
+    }
+
+    setIsSubmitting(true);
+    setAuthError('');
+    try {
+      const googleUser = await signInWithGoogle(activeClientId);
+      onLoginSuccess(googleUser);
+      onShowToast(`✓ 已成功透過 Google 帳號登入：${googleUser.name}`);
+      handleClose();
+    } catch (err: any) {
+      if (err.message === 'MISSING_CLIENT_ID') {
+        setShowConfigProvider('google');
+        setAuthError('請填寫 Google OAuth Client ID（或點擊下方一鍵體驗登入）');
+      } else {
+        setAuthError(err.message || 'Google 登入失敗或已取消');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 模擬/測試快速體驗登入
+  const handleDemoSignIn = (provider: 'google' | 'apple') => {
     setIsSubmitting(true);
     setAuthError('');
     setTimeout(() => {
       setIsSubmitting(false);
-      const googleUser: UserProfile = {
-        id: `google_${Date.now().toString(36)}`,
-        name: 'Google 食客',
-        email: 'gourmet.explorer@gmail.com',
-        avatarEmoji: '🥢',
-        provider: 'google',
+      const demoUser: UserProfile = {
+        id: `${provider}_demo_${Date.now().toString(36)}`,
+        name: provider === 'google' ? 'Google 探索者' : 'Apple 雅士',
+        email: provider === 'google' ? 'taster.google@gmail.com' : 'taster.apple@icloud.com',
+        avatarEmoji: provider === 'google' ? '🥢' : '🍎',
+        provider: provider,
         isGuest: false,
         joinedAt: new Date().toISOString().split('T')[0],
         lastSyncedAt: new Date().toISOString(),
       };
-      onLoginSuccess(googleUser);
-      onShowToast('✓ 已成功透過 Google 帳號登入 BiteNote');
+      onLoginSuccess(demoUser);
+      onShowToast(`✓ 已透過 ${provider === 'google' ? 'Google' : 'Apple'} 快速驗證進入 BiteNote`);
       handleClose();
-    }, 450);
+    }, 350);
   };
 
   // 3. Email 寄送驗證碼
@@ -488,7 +554,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     accessibilityRole="button"
                     accessibilityLabel="透過 Apple 快速登入"
                     disabled={isSubmitting}
-                    onPress={handleAppleSignIn}
+                    onPress={() => handleAppleSignIn()}
                     style={({ pressed }) => [
                       styles.appleSignInBtn,
                       {
@@ -520,7 +586,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     accessibilityRole="button"
                     accessibilityLabel="透過 Google 帳號登入"
                     disabled={isSubmitting}
-                    onPress={handleGoogleSignIn}
+                    onPress={() => handleGoogleSignIn()}
                     style={({ pressed }) => [
                       styles.googleSignInBtn,
                       {
@@ -540,6 +606,77 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </Text>
                   </Pressable>
                 </View>
+
+
+                {/* 憑證填寫引導面板（未設定 Client ID 時自動展開） */}
+                {showConfigProvider && (
+                  <View
+                    style={[
+                      styles.oauthConfigBox,
+                      {
+                        backgroundColor: colors.surfaceElevated,
+                        borderColor: colors.accent,
+                      },
+                    ]}
+                  >
+                    <View style={styles.oauthConfigHeader}>
+                      <Text style={[styles.oauthConfigTitle, { color: colors.accent }]}>
+                        🔑 設定 {showConfigProvider === 'google' ? 'Google OAuth Web Client ID' : 'Apple Service ID'}
+                      </Text>
+                      <Pressable onPress={() => setShowConfigProvider(null)}>
+                        <Text style={{ fontSize: 13, color: colors.inkMuted }}>✕ 關閉</Text>
+                      </Pressable>
+                    </View>
+                    <Text style={[styles.oauthConfigHint, { color: colors.inkSecondary }]}>
+                      {showConfigProvider === 'google'
+                        ? '可至 Google Cloud Console 免費建立 OAuth 2.0 Web 用戶端 ID，填入後即可全自動彈出官方登入視窗。'
+                        : '可至 Apple Developer 帳號建立 Sign in with Apple 服務 ID，填入後即可調用官方登入。'}
+                    </Text>
+                    <TextInput
+                      value={clientIdInput}
+                      onChangeText={setClientIdInput}
+                      placeholder={
+                        showConfigProvider === 'google'
+                          ? '例：xxxxxx.apps.googleusercontent.com'
+                          : '例：com.bitenote.web.auth'
+                      }
+                      placeholderTextColor={colors.inkMuted}
+                      style={[
+                        styles.oauthInput,
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          color: colors.ink,
+                        },
+                      ]}
+                    />
+                    <View style={styles.oauthConfigBtnRow}>
+                      <Pressable
+                        onPress={() => {
+                          if (showConfigProvider === 'google') {
+                            handleGoogleSignIn(clientIdInput);
+                          } else {
+                            handleAppleSignIn(clientIdInput);
+                          }
+                        }}
+                        style={[styles.oauthSaveBtn, { backgroundColor: colors.accent }]}
+                      >
+                        <Text style={styles.oauthSaveBtnText}>💾 儲存並官方授權</Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => handleDemoSignIn(showConfigProvider)}
+                        style={[
+                          styles.oauthDemoBtn,
+                          { backgroundColor: colors.surfaceSubtle, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.oauthDemoBtnText, { color: colors.ink }]}>
+                          ⚡ 一鍵快速體驗
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
 
                 {/* 4. 典雅分隔線 */}
                 <View style={styles.dividerRow}>
@@ -1321,5 +1458,68 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.mono,
     fontSize: 10.5,
     letterSpacing: 0.4,
+  },
+  avatarImg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  oauthConfigBox: {
+    marginTop: SPACING.sm,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1.5,
+    gap: 8,
+  },
+  oauthConfigHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  oauthConfigTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: FONTS.serif,
+  },
+  oauthConfigHint: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  oauthInput: {
+    height: 40,
+    borderWidth: 1,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: 10,
+    fontSize: 13,
+    fontFamily: FONTS.mono,
+  },
+  oauthConfigBtnRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  oauthSaveBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: RADIUS.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  oauthSaveBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  oauthDemoBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  oauthDemoBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
