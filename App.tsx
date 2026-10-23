@@ -66,8 +66,9 @@ import {
 import { AuthModal } from './src/components/AuthModal';
 import { SplashScreen } from './src/components/SplashScreen';
 import { TasteMapTab } from './src/components/TasteMapTab';
+import { ProfileTab } from './src/components/ProfileTab';
 
-type MainTab = 'home' | 'map' | 'places' | 'evolution' | 'timeline';
+type MainTab = 'home' | 'map' | 'places' | 'evolution' | 'timeline' | 'profile';
 type VerdictFilter = 'all' | 'favorite' | 'price_up' | 'repeat' | TastingVerdict;
 
 export default function App() {
@@ -579,7 +580,7 @@ export default function App() {
           </Pressable>
 
           <View style={styles.utilityBtnsRow}>
-            {activeTab !== 'home' && (
+            {activeTab !== 'home' && activeTab !== 'profile' && (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="快速記一口"
@@ -594,70 +595,6 @@ export default function App() {
                 </Text>
               </Pressable>
             )}
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="切換深淺色主題"
-              onPress={() => {
-                const nextMode = colors.isDark ? 'light' : 'dark';
-                const nextSettings = { ...settings, themeMode: nextMode as any };
-                persistAll(places, dishes, biteLogs, nextSettings);
-                showToast(
-                  `已切換為「${nextMode === 'dark' ? '深夜食堂（深色）' : '亞麻和紙（淺色）'}」主題`,
-                  1000
-                );
-              }}
-              style={[
-                styles.compactUtilityBtn,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.compactUtilityBtnText, { color: colors.ink }]}>
-                {colors.isDark ? '☀️ 淺色' : '🌙 深色'}
-              </Text>
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="開啟系統備份與設定"
-              onPress={() => setBackupModalVisible(true)}
-              style={[
-                styles.compactUtilityBtn,
-                { backgroundColor: colors.surface, borderColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.compactUtilityBtnText, { color: colors.herb }]}>
-                ☁️ 備份
-              </Text>
-            </Pressable>
-
-            {/* 登入身分與個人面板 */}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={settings.userProfile && !settings.userProfile.isGuest ? '個人帳號與同步檔案' : '登入帳號或以訪客體驗'}
-              onPress={() => setAuthModalVisible(true)}
-              style={[
-                styles.compactUtilityBtn,
-                settings.userProfile && !settings.userProfile.isGuest
-                  ? { backgroundColor: colors.accentSoft, borderColor: colors.accent }
-                  : { backgroundColor: colors.surface, borderColor: colors.border },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.compactUtilityBtnText,
-                  {
-                    color: settings.userProfile && !settings.userProfile.isGuest
-                      ? colors.accent
-                      : colors.ink,
-                  },
-                ]}
-              >
-                {settings.userProfile && !settings.userProfile.isGuest
-                  ? `${settings.userProfile.avatarEmoji || '👤'} ${settings.userProfile.name.split(' ')[0]}`
-                  : '👤 登入'}
-              </Text>
-            </Pressable>
           </View>
         </View>
       </View>
@@ -1156,7 +1093,7 @@ export default function App() {
         {/* ===================================================================
          * 非主頁共用：搜尋列與味覺印章篩選（供「店家名冊」、「評分漲跌」、「拍立得日記」使用）
          * ================================================================= */}
-        {activeTab !== 'home' && (
+        {(activeTab === 'places' || activeTab === 'evolution' || activeTab === 'timeline') && (
           <View style={styles.controlsSection}>
             <View
               style={[
@@ -1860,6 +1797,42 @@ export default function App() {
             </View>
           </View>
         )}
+
+        {/* ===================================================================
+         * 分頁 5：👤 「我的」個人手帳與設定中心
+         * ================================================================= */}
+        {activeTab === 'profile' && (
+          <ProfileTab
+            settings={settings}
+            colors={colors}
+            places={places}
+            dishes={dishes}
+            biteLogs={biteLogs}
+            onUpdateSettings={(partial) => {
+              const next = { ...settings, ...partial };
+              persistAll(places, dishes, biteLogs, next);
+            }}
+            onLoginSuccess={handleLoginSuccess}
+            onLogout={handleLogout}
+            onOpenAuthModal={() => setAuthModalVisible(true)}
+            onOpenBackupModal={() => setBackupModalVisible(true)}
+            onOpenPrivacy={() => openPolicyLink('privacy')}
+            onOpenTerms={() => openPolicyLink('terms')}
+            onExportBackup={() => {
+              exportBackupFile({ settings, places, dishes, biteLogs });
+            }}
+            onResetToSeed={() => {
+              persistAll(SEED_PLACES, SEED_DISHES, SEED_BITE_LOGS, DEFAULT_SETTINGS);
+              setSelectedPlaceId(SEED_PLACES[0].id);
+            }}
+            onClearAllData={() => {
+              persistAll([], [], [], settings);
+              setSelectedPlaceId('');
+              showToast('🧹 已清空所有資料！');
+            }}
+            onShowToast={showToast}
+          />
+        )}
       </ScrollView>
       )}
 
@@ -1878,6 +1851,7 @@ export default function App() {
           { id: 'places' as MainTab, icon: '📖', label: '店家名冊' },
           { id: 'evolution' as MainTab, icon: '📈', label: '評分漲跌' },
           { id: 'timeline' as MainTab, icon: '📸', label: '拍立得日記' },
+          { id: 'profile' as MainTab, icon: '👤', label: '我的' },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -2966,9 +2940,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     borderTopWidth: 1,
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
     paddingVertical: 5,
-    gap: 4,
+    gap: 2,
   },
   bottomTabItem: {
     flex: 1,
@@ -3000,7 +2974,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.mono,
   },
   bottomTabLabel: {
-    fontSize: 11.5,
+    fontSize: 10.5,
     textAlign: 'center',
   },
   appFooterContainer: {
