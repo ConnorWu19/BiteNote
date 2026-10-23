@@ -96,10 +96,10 @@ export const VERDICT_OPTIONS: Record<TastingVerdict, VerdictMeta> = {
   },
   avoid: {
     id: 'avoid',
-    label: '拒絕再訪',
-    shortLabel: '不再考慮',
+    label: '地雷勿點',
+    shortLabel: '地雷勿點',
     emoji: '🚫',
-    description: '完全不合口味或踩雷，寫進手帳提醒自己別再點',
+    description: '品項踩雷或不合口味，寫進手帳提醒自己別再點',
     colorLight: '#6E655F',
     bgLight: '#EFECE8',
     colorDark: '#B8AFA6',

@@ -108,6 +108,20 @@ export default function App() {
     setLightboxLog(log || dish.logs[dish.logs.length - 1] || null);
   };
 
+  // 監聽 Web 端 bfcache 復原，防止從外部分頁/導航返回時整個 App 頁面凍結或空白
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setSettings((prev) => ({ ...prev }));
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   // 初始化載入本機資料庫，並在行動端 Web 鎖定 Viewport 與輸入框 16px 字級，徹底防止點擊搜尋欄時畫面自動放大與右側跑版
   useEffect(() => {
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
@@ -445,12 +459,30 @@ export default function App() {
     showToast('已從手帳移除該筆品嚐紀錄');
   };
 
-  // 開啟外部 Google Maps 查看或導航
+  // 開啟外部 Google Maps 查看或導航（強制開新分頁，徹底避免行動端瀏覽器返回時頁面空白）
   const handleOpenGoogleMaps = (place: Place) => {
     const url = buildGoogleMapsUrl(place);
-    Linking.openURL(url).catch(() => {
-      showToast('無法開啟外部地圖連結');
-    });
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (document.body.contains(a)) {
+            document.body.removeChild(a);
+          }
+        }, 150);
+      } catch (e) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    } else {
+      Linking.openURL(url).catch(() => {
+        showToast('無法開啟外部地圖連結');
+      });
+    }
   };
 
   // 開啟條款與隱私權政策（相容 Web 與 Native）
@@ -491,7 +523,7 @@ export default function App() {
     { id: 'encore', label: '🔥 驚為天人' },
     { id: 'solid', label: '😋 穩定發揮' },
     { id: 'meh', label: '😐 普通還好' },
-    { id: 'avoid', label: '🚫 拒絕再訪' },
+    { id: 'avoid', label: '🚫 地雷勿點' },
   ];
 
   // 應用程式啟動畫面（清爽無硬體負擔：純 CSS/原生 Animated 微動態、紙本印章工藝、無縫淡出切換）

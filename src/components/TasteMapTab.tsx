@@ -9,7 +9,7 @@
  * 5. 雙主題與雙模式：支援「地圖模式」與「清單模式」隨心切換，自適應淺色和紙與深夜食堂。
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
   Linking,
@@ -133,6 +133,60 @@ export const TasteMapTab: React.FC<TasteMapTabProps> = ({
   // 橫向滑動列表引用（供點擊 Pin 時自動滾動置中）
   const cardScrollRef = useRef<ScrollView>(null);
   const iframeRef = useRef<any>(null);
+  const [iframeKey, setIframeKey] = useState<number>(0);
+
+  // 安全開啟外部 Google Maps 導航（強制以真實新分頁開啟，徹底避免行動端覆寫 App 歷史紀錄）
+  const handleOpenNav = useCallback((place: EnrichedPlace) => {
+    const url = buildGoogleMapsUrl(place);
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          if (document.body.contains(a)) {
+            document.body.removeChild(a);
+          }
+        }, 150);
+      } catch (e) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    } else {
+      Linking.openURL(url).catch(() => {});
+    }
+  }, []);
+
+  // 監聽頁面恢復（從導航/其他分頁返回時，自動重繪喚醒 Leaflet 地圖，防止 bfcache 凍結導致空白）
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        setTimeout(() => {
+          setIframeKey((k) => k + 1);
+        }, 80);
+      }
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setIframeKey((k) => k + 1);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
 
   // 當外部/地圖選中店家時，捲動至對應卡片
   useEffect(() => {
@@ -416,10 +470,16 @@ export const TasteMapTab: React.FC<TasteMapTabProps> = ({
               }
             });
 
-            // 確保地圖尺寸自適應
+            // 確保地圖尺寸自適應，並在視窗重新聚焦時自動校正
             setTimeout(function() {
               map.invalidateSize();
             }, 250);
+            window.addEventListener('focus', function() {
+              setTimeout(function() { if (map) map.invalidateSize(); }, 100);
+            });
+            window.addEventListener('pageshow', function() {
+              setTimeout(function() { if (map) map.invalidateSize(); }, 100);
+            });
           </script>
         </body>
       </html>
@@ -625,6 +685,7 @@ export const TasteMapTab: React.FC<TasteMapTabProps> = ({
           {/* Web 環境下使用純淨零負擔之 Leaflet iframe */}
           {Platform.OS === 'web' ? (
             <iframe
+              key={`taste-map-iframe-${iframeKey}`}
               ref={iframeRef}
               srcDoc={mapHtml}
               style={{
@@ -802,10 +863,7 @@ export const TasteMapTab: React.FC<TasteMapTabProps> = ({
                         <Pressable
                           accessibilityRole="button"
                           accessibilityLabel={`開啟 Google 地圖導航前往 ${place.name}`}
-                          onPress={() => {
-                            const url = buildGoogleMapsUrl(place);
-                            Linking.openURL(url);
-                          }}
+                          onPress={() => handleOpenNav(place)}
                           style={[
                             styles.actionSmallBtn,
                             { backgroundColor: colors.surface, borderColor: colors.border },
@@ -970,10 +1028,7 @@ export const TasteMapTab: React.FC<TasteMapTabProps> = ({
                     ]}
                   >
                     <Pressable
-                      onPress={() => {
-                        const url = buildGoogleMapsUrl(place);
-                        Linking.openURL(url);
-                      }}
+                      onPress={() => handleOpenNav(place)}
                       style={styles.listActionTextBtn}
                     >
                       <Text
