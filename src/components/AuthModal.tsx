@@ -8,7 +8,7 @@
  * 4. 嚴格對比度與主題適應：完美適應亞麻和紙（淺色）與深夜食堂（深色）雙主題。
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -23,6 +23,7 @@ import {
 } from 'react-native';
 import { AuthProviderType, UserProfile } from '../types/models';
 import { FONTS, RADIUS, SPACING, ThemeColors } from '../theme/theme';
+import { TASTE_QUOTES } from './SplashScreen';
 
 export interface AuthModalProps {
   visible: boolean;
@@ -53,6 +54,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [otpCode, setOtpCode] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
+
+  // 隨機飲食心語（每次開啟登入畫面自動隨機換一句，不支援手動切換）
+  const [randomQuote, setRandomQuote] = useState<string>(() => {
+    return TASTE_QUOTES[Math.floor(Math.random() * TASTE_QUOTES.length)];
+  });
+
+  useEffect(() => {
+    if (visible) {
+      setRandomQuote((prev) => {
+        const candidates = TASTE_QUOTES.filter((q) => q !== prev);
+        if (candidates.length > 0) {
+          return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+        return TASTE_QUOTES[Math.floor(Math.random() * TASTE_QUOTES.length)];
+      });
+    }
+  }, [visible]);
 
   // 是否為真實登入使用者（非訪客）
   const isAuthenticated = !!currentUser && !currentUser.isGuest;
@@ -392,8 +410,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     不社交、不業配、不演算法 — 每一口，只向自己的真實舌尖交代。
                   </Text>
                 </View>
+                {/* 2. 隨機飲食心語（每次開啟登入畫面自動更換，純淨展示不支援手動切換） */}
+                <View
+                  style={[
+                    styles.authDailyQuoteCard,
+                    {
+                      backgroundColor: colors.surfaceSubtle,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.authDailyQuoteStamp,
+                      { backgroundColor: colors.accent },
+                    ]}
+                  >
+                    <Text style={styles.authDailyQuoteStampText}>心語</Text>
+                  </View>
+                  <View style={styles.authDailyQuoteContent}>
+                    <Text style={[styles.authDailyQuoteTitle, { color: colors.ink }]}>
+                      {randomQuote}
+                    </Text>
+                    <Text style={[styles.authDailyQuoteSubtitle, { color: colors.inkMuted }]}>
+                      ✦ 每日味覺手札
+                    </Text>
+                  </View>
+                </View>
 
-                {/* 2. 輕量三保證徽章（清爽無負擔承諾） */}
+                {/* 3. 輕量三保證徽章（清爽無負擔承諾） */}
                 <View style={styles.guaranteePillsRow}>
                   <View
                     style={[
@@ -1233,5 +1278,48 @@ const styles = StyleSheet.create({
   },
   guestLoginSection: {
     paddingTop: 2,
+  },
+  authDailyQuoteCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.sm,
+    gap: 10,
+  },
+  authDailyQuoteStamp: {
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  authDailyQuoteStampText: {
+    color: '#FFFFFF',
+    fontFamily: FONTS.serif,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  authDailyQuoteContent: {
+    flex: 1,
+    minWidth: 0,
+  },
+  authDailyQuoteTitle: {
+    fontFamily: FONTS.serif,
+    fontSize: 13,
+    fontWeight: '700',
+    lineHeight: 18,
+    marginBottom: 2,
+  },
+  authDailyQuoteSubtitle: {
+    fontFamily: FONTS.mono,
+    fontSize: 10.5,
+    letterSpacing: 0.4,
   },
 });

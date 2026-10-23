@@ -64,7 +64,7 @@ import {
   resetMobileViewportZoom,
 } from './src/components/Modals';
 import { AuthModal } from './src/components/AuthModal';
-import { SplashScreen, TASTE_QUOTES } from './src/components/SplashScreen';
+import { SplashScreen } from './src/components/SplashScreen';
 import { TasteMapTab } from './src/components/TasteMapTab';
 
 type MainTab = 'home' | 'map' | 'places' | 'evolution' | 'timeline';
@@ -101,10 +101,6 @@ export default function App() {
   const [lightboxDish, setLightboxDish] = useState<EnrichedDish | null>(null);
   const [lightboxLog, setLightboxLog] = useState<BiteLog | null>(null);
   const [toastMessage, setToastMessage] = useState<string>('');
-  const [quoteIndex, setQuoteIndex] = useState<number>(() =>
-    Math.floor(Math.random() * TASTE_QUOTES.length)
-  );
-  const currentDailyQuote = TASTE_QUOTES[quoteIndex % TASTE_QUOTES.length];
 
   // 開啟相片全螢幕放大燈箱（嚴格鎖定同一家店、同一個品項之歷次品嚐紀錄，左右滑動僅在同品項各次回訪照片切換）
   const openPhotoLightbox = (dish: EnrichedDish, log?: BiteLog) => {
@@ -681,42 +677,7 @@ export default function App() {
                   拍下剛上桌的食物照片、記下當下價格與真實評分。同品項第 2 次、第 3 次回訪會自動比對評分起伏與漲價軌跡。
                 </Text>
 
-                {/* 方案 D：今日飲食心語（同步啟動畫面之精神宣言，點擊可換下一句） */}
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="點擊切換下一句飲食心語"
-                  onPress={() => setQuoteIndex((prev) => (prev + 1) % TASTE_QUOTES.length)}
-                  style={({ pressed }) => [
-                    styles.homeDailyQuoteCard,
-                    {
-                      backgroundColor: colors.surfaceSubtle,
-                      borderColor: colors.border,
-                      opacity: pressed ? 0.88 : 1,
-                    },
-                  ]}
-                >
-                  <View style={styles.homeDailyQuoteLeft}>
-                    <View
-                      style={[
-                        styles.homeDailyQuoteStamp,
-                        { backgroundColor: colors.accent },
-                      ]}
-                    >
-                      <Text style={styles.homeDailyQuoteStampText}>心語</Text>
-                    </View>
-                    <View style={styles.homeDailyQuoteContent}>
-                      <Text style={[styles.homeDailyQuoteTitle, { color: colors.ink }]}>
-                        {currentDailyQuote}
-                      </Text>
-                      <Text style={[styles.homeDailyQuoteHint, { color: colors.inkMuted }]}>
-                        ✦ 每日味覺手札 ・ 點擊隨喜換一句
-                      </Text>
-                    </View>
-                  </View>
-                  <Text style={[styles.homeDailyQuoteArrow, { color: colors.accent }]}>
-                    ↻
-                  </Text>
-                </Pressable>
+                
               </View>
 
               <View style={styles.homeHeroActionsRow}>
@@ -2191,62 +2152,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontFamily: FONTS.sans,
   },
-  homeDailyQuoteCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    marginTop: 10,
-    gap: 8,
-  },
-  homeDailyQuoteLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    minWidth: 0,
-  },
-  homeDailyQuoteStamp: {
-    width: 32,
-    height: 32,
-    borderRadius: RADIUS.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  homeDailyQuoteStampText: {
-    color: '#FFFFFF',
-    fontFamily: FONTS.serif,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  homeDailyQuoteContent: {
-    flex: 1,
-    minWidth: 0,
-  },
-  homeDailyQuoteTitle: {
-    fontFamily: FONTS.serif,
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 18,
-    marginBottom: 2,
-  },
-  homeDailyQuoteHint: {
-    fontFamily: FONTS.mono,
-    fontSize: 10.5,
-    letterSpacing: 0.4,
-  },
-  homeDailyQuoteArrow: {
-    fontFamily: FONTS.mono,
-    fontSize: 16,
-    fontWeight: '700',
-    paddingHorizontal: 4,
-    flexShrink: 0,
-  },
+  
   homeHeroActionsRow: {
     width: '100%',
     flexDirection: 'row',
