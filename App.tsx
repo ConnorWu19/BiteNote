@@ -389,8 +389,8 @@ export default function App() {
       const newDish: Dish = {
         id: targetDishId,
         placeId: submission.placeId,
-        name: submission.newDishName || '招牌料理',
-        category: submission.newDishCategory || '招牌主食',
+        name: submission.newDishName || '私藏料理',
+        category: submission.newDishCategory || '台灣小吃',
         coverUri: submission.photoUri,
         createdAt: nowIso,
         updatedAt: nowIso,
@@ -567,7 +567,7 @@ export default function App() {
         </View>
       ) : null}
 
-      {/* 頂部雜誌感品牌刊頭 (Masthead Header) — 平衡典雅、雙側呼應、不再留白失重 */}
+      {/* 頂部雜誌感品牌刊頭 (Masthead Header) — 純粹俐落字體設計 */}
       <View style={[styles.masthead, { borderBottomColor: colors.border, backgroundColor: colors.canvas }]}>
         <View style={styles.mastheadTopRow}>
           <Pressable
@@ -576,16 +576,10 @@ export default function App() {
             onPress={() => setActiveTab('home')}
             style={styles.logoRow}
           >
-            <View style={[styles.logoStamp, { backgroundColor: colors.accent }]}>
-              <Text style={styles.logoStampText}>噛</Text>
-            </View>
             <View style={styles.brandTextCol}>
               <View style={styles.brandTitleRow}>
                 <Text style={[styles.brandTitleEn, { color: colors.ink }]}>BiteNote</Text>
                 <Text style={[styles.brandTitleZh, { color: colors.accent }]}>吃一口</Text>
-                <View style={[styles.brandIssueBadge, { backgroundColor: colors.accentSoft }]}>
-                  <Text style={[styles.brandIssueBadgeText, { color: colors.accent }]}>私密手帳</Text>
-                </View>
               </View>
               <Text
                 numberOfLines={1}

@@ -23,6 +23,17 @@ export type PlaceCategory =
   | '私房小店';
 
 export type DishCategory =
+  | '台灣小吃'
+  | '日式料理'
+  | '中式料理'
+  | '美式料理'
+  | '歐式料理'
+  | '港式料理'
+  | '火鍋燒烤'
+  | '異國風味'
+  | '亞洲美饌'
+  | '咖啡廳甜點'
+  | '手搖飲料'
   | '招牌主食'
   | '單點小菜'
   | '湯品鍋物'
@@ -120,11 +131,17 @@ export const PLACE_CATEGORIES: PlaceCategory[] = [
 ];
 
 export const DISH_CATEGORIES: DishCategory[] = [
-  '招牌主食',
-  '單點小菜',
-  '湯品鍋物',
-  '甜點烘焙',
-  '特調飲品',
+  '台灣小吃',
+  '日式料理',
+  '中式料理',
+  '美式料理',
+  '歐式料理',
+  '港式料理',
+  '火鍋燒烤',
+  '異國風味',
+  '亞洲美饌',
+  '咖啡廳甜點',
+  '手搖飲料',
 ];
 
 export interface PhotoFilterMeta {

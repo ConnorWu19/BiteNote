@@ -134,7 +134,7 @@ export const BiteComposerModal: React.FC<BiteComposerModalProps> = ({
   const [dishMode, setDishMode] = useState<'existing' | 'new'>('existing');
   const [selectedDishId, setSelectedDishId] = useState<string>('');
   const [newDishName, setNewDishName] = useState<string>('');
-  const [newDishCategory, setNewDishCategory] = useState<DishCategory>('招牌主食');
+  const [newDishCategory, setNewDishCategory] = useState<DishCategory>('台灣小吃');
 
   const [priceText, setPriceText] = useState<string>('190');
   const [rating, setRating] = useState<number>(4.5);
@@ -509,34 +509,41 @@ export const BiteComposerModal: React.FC<BiteComposerModalProps> = ({
                       },
                     ]}
                   />
-                  <View style={styles.wrapPills}>
-                    {DISH_CATEGORIES.map((cat) => {
-                      const selected = newDishCategory === cat;
-                      return (
-                        <Pressable
-                          key={cat}
-                          onPress={() => setNewDishCategory(cat)}
-                          style={[
-                            styles.smallChip,
-                            {
-                              backgroundColor: selected
-                                ? colors.ink
-                                : colors.surface,
-                              borderColor: selected ? colors.ink : colors.border,
-                            },
-                          ]}
-                        >
-                          <Text
+                  <View style={{ marginTop: 8, gap: 6 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '700', color: colors.inkSecondary }}>
+                      選擇食物分類：
+                    </Text>
+                    <View style={styles.wrapPills}>
+                      {DISH_CATEGORIES.map((cat) => {
+                        const selected = newDishCategory === cat;
+                        return (
+                          <Pressable
+                            key={cat}
+                            accessibilityRole="button"
+                            accessibilityLabel={`選擇分類：${cat}`}
+                            onPress={() => setNewDishCategory(cat)}
                             style={[
-                              styles.smallChipText,
-                              { color: selected ? colors.canvas : colors.inkSecondary },
+                              styles.smallChip,
+                              {
+                                backgroundColor: selected
+                                  ? colors.ink
+                                  : colors.surface,
+                                borderColor: selected ? colors.ink : colors.border,
+                              },
                             ]}
                           >
-                            {cat}
-                          </Text>
-                        </Pressable>
-                      );
-                    })}
+                            <Text
+                              style={[
+                                styles.smallChipText,
+                                { color: selected ? colors.canvas : colors.inkSecondary },
+                              ]}
+                            >
+                              {cat}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
                   </View>
                 </View>
               )}
