@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types scripts/verify-logic.ts"
+    "test": "node --experimental-strip-types scripts/verify-logic.ts",
+    "build:web": "expo export -p web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",

@@ -54,6 +54,9 @@
     "plugins": [
       "./plugins/withNativeBackup.js",
       "expo-sqlite"
-    ]
+    ],
+    "experiments": {
+      "baseUrl": "/BiteNote"
+    }
   }
 }
