@@ -6,6 +6,8 @@
 import { Platform } from 'react-native';
 import { UserProfile } from '../types/models';
 
+export const DEFAULT_GOOGLE_CLIENT_ID = '712050840003-si53cvbugasg38o2jhmm22fvj59lpce4.apps.googleusercontent.com';
+
 /**
  * 簡易安全的 JWT 解碼（無須肥大第三方套件）
  */
@@ -100,7 +102,7 @@ export function loadAppleSdk(): Promise<void> {
  */
 export async function signInWithGoogle(clientId?: string): Promise<UserProfile> {
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    const activeClientId = clientId?.trim();
+    const activeClientId = (clientId || DEFAULT_GOOGLE_CLIENT_ID).trim();
     if (!activeClientId) {
       throw new Error('MISSING_CLIENT_ID');
     }

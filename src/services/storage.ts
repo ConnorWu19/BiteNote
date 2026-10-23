@@ -51,7 +51,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultCurrency: 'NT$',
   lastBackupAt: new Date().toISOString(),
   userProfile: DEFAULT_USER_PROFILE,
-  googleClientId: '',
+  googleClientId: '712050840003-si53cvbugasg38o2jhmm22fvj59lpce4.apps.googleusercontent.com',
   appleServiceId: '',
 };
 
@@ -102,8 +102,12 @@ export async function loadDatabaseState(): Promise<AppDatabaseState> {
         const raw = window.localStorage.getItem(WEB_STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<AppDatabaseState>;
+          const loadedSettings = { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) };
+          if (!loadedSettings.googleClientId) {
+            loadedSettings.googleClientId = DEFAULT_SETTINGS.googleClientId;
+          }
           return {
-            settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) },
+            settings: loadedSettings,
             places: Array.isArray(parsed.places) ? parsed.places : SEED_PLACES,
             dishes: Array.isArray(parsed.dishes) ? parsed.dishes : SEED_DISHES,
             biteLogs: Array.isArray(parsed.biteLogs) ? parsed.biteLogs : SEED_BITE_LOGS,

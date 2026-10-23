@@ -23,7 +23,7 @@ import {
   View,
 } from 'react-native';
 import { AuthProviderType, AppSettings, UserProfile } from '../types/models';
-import { signInWithGoogle, signInWithApple, loadGoogleSdk, loadAppleSdk } from '../services/oauth';
+import { signInWithGoogle, signInWithApple, loadGoogleSdk, loadAppleSdk, DEFAULT_GOOGLE_CLIENT_ID } from '../services/oauth';
 import { FONTS, RADIUS, SPACING, ThemeColors } from '../theme/theme';
 import { TASTE_QUOTES } from './SplashScreen';
 
@@ -146,7 +146,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   // 2. 透過 Google 帳號登入（支援 Google Identity Services 官方彈窗授權）
   const handleGoogleSignIn = async (overrideId?: string) => {
-    const activeClientId = (overrideId || clientIdInput || settings?.googleClientId || '').trim();
+    const activeClientId = (overrideId || clientIdInput || settings?.googleClientId || DEFAULT_GOOGLE_CLIENT_ID).trim();
     if (!activeClientId) {
       setShowConfigProvider('google');
       setClientIdInput(settings?.googleClientId || '');
