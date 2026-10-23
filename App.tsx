@@ -457,6 +457,18 @@ export default function App() {
     });
   };
 
+  // 開啟條款與隱私權政策（相容 Web 與 Native）
+  const openPolicyLink = (path: 'privacy' | 'terms') => {
+    const filename = path === 'privacy' ? 'privacy.html' : 'terms.html';
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.open(`./${filename}`, '_blank', 'noopener,noreferrer');
+    } else {
+      Linking.openURL(`https://connorwu19.github.io/BiteNote/${filename}`).catch(() => {
+        showToast('無法開啟條款頁面');
+      });
+    }
+  };
+
   // 開啟「記一口」抽屜
   const openComposerForPlace = (placeId?: string) => {
     setComposerTargetDish(null);
@@ -1823,6 +1835,36 @@ export default function App() {
                   );
                 })}
             </View>
+
+            {/* 頁尾法律與隱私連結（Web 版與 App 底端均可常駐查閱） */}
+            <View style={styles.appFooterContainer}>
+              <Text style={[styles.appFooterText, { color: colors.inkMuted }]}>
+                © 2026 BiteNote 吃一口 · 本機優先極簡飲食手帳
+              </Text>
+              <View style={styles.appFooterLinksRow}>
+                <Pressable
+                  accessibilityRole="link"
+                  accessibilityLabel="查看隱私權政策"
+                  onPress={() => openPolicyLink('privacy')}
+                  style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                >
+                  <Text style={[styles.appFooterLinkText, { color: colors.accent }]}>
+                    隱私權政策 (Privacy)
+                  </Text>
+                </Pressable>
+                <Text style={{ fontSize: 12, color: colors.inkMuted }}>·</Text>
+                <Pressable
+                  accessibilityRole="link"
+                  accessibilityLabel="查看服務條款"
+                  onPress={() => openPolicyLink('terms')}
+                  style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                >
+                  <Text style={[styles.appFooterLinkText, { color: colors.accent }]}>
+                    服務條款 (Terms)
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -1948,6 +1990,8 @@ export default function App() {
           setBackupModalVisible(false);
           setAuthModalVisible(true);
         }}
+        onOpenPrivacy={() => openPolicyLink('privacy')}
+        onOpenTerms={() => openPolicyLink('terms')}
         onPreviewSplash={() => {
           setBackupModalVisible(false);
           setPreviewSplash(true);
@@ -1974,6 +2018,8 @@ export default function App() {
         currentUser={settings.userProfile}
         colors={colors}
         onClose={() => setAuthModalVisible(false)}
+        onOpenPrivacy={() => openPolicyLink('privacy')}
+        onOpenTerms={() => openPolicyLink('terms')}
         onLoginSuccess={handleLoginSuccess}
         onLogout={handleLogout}
         onShowToast={showToast}
@@ -3013,5 +3059,28 @@ const styles = StyleSheet.create({
   bottomTabLabel: {
     fontSize: 11.5,
     textAlign: 'center',
+  },
+  appFooterContainer: {
+    alignItems: 'center',
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.md,
+    marginTop: SPACING.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    gap: 6,
+  },
+  appFooterText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  appFooterLinksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  appFooterLinkText: {
+    fontSize: 12,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

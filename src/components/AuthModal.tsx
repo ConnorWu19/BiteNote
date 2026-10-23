@@ -32,6 +32,8 @@ export interface AuthModalProps {
   onLoginSuccess: (user: UserProfile) => void;
   onLogout: () => void;
   onShowToast: (message: string) => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -42,6 +44,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onLoginSuccess,
   onLogout,
   onShowToast,
+  onOpenPrivacy,
+  onOpenTerms,
 }) => {
   // 登入流程狀態
   const [emailInput, setEmailInput] = useState<string>('');

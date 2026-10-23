@@ -1455,6 +1455,8 @@ interface BackupSettingsModalProps {
   onClearAllData?: () => void;
   onOpenAuthModal?: () => void;
   onPreviewSplash?: () => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
 }
 
 export const BackupSettingsModal: React.FC<BackupSettingsModalProps> = ({
@@ -1470,6 +1472,8 @@ export const BackupSettingsModal: React.FC<BackupSettingsModalProps> = ({
   onClearAllData,
   onOpenAuthModal,
   onPreviewSplash,
+  onOpenPrivacy,
+  onOpenTerms,
 }) => {
   const [importJsonText, setImportJsonText] = useState<string>('');
   const [showImportBox, setShowImportBox] = useState<boolean>(false);
@@ -1816,6 +1820,61 @@ export const BackupSettingsModal: React.FC<BackupSettingsModalProps> = ({
                   🔄 恢復預設示範資料（含雞白湯拉麵 3 次價格與評分演變範例）
                 </Text>
               </Pressable>
+            </View>
+
+            {/* 法律聲明與條款政策 */}
+            <View
+              style={[
+                styles.fieldBlock,
+                {
+                  marginTop: 16,
+                  paddingTop: 16,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={[styles.fieldLabel, { color: colors.inkSecondary }]}>
+                📜 法律條款與資料政策 (Legal & Policies)
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+                {onOpenPrivacy && (
+                  <Pressable
+                    onPress={onOpenPrivacy}
+                    accessibilityRole="link"
+                    style={({ pressed }) => [
+                      styles.legalPolicyBtn,
+                      {
+                        backgroundColor: colors.surfaceSubtle,
+                        borderColor: colors.border,
+                        opacity: pressed ? 0.7 : 1,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.legalPolicyBtnText, { color: colors.accent }]}>
+                      🔒 隱私權政策 (Privacy)
+                    </Text>
+                  </Pressable>
+                )}
+                {onOpenTerms && (
+                  <Pressable
+                    onPress={onOpenTerms}
+                    accessibilityRole="link"
+                    style={({ pressed }) => [
+                      styles.legalPolicyBtn,
+                      {
+                        backgroundColor: colors.surfaceSubtle,
+                        borderColor: colors.border,
+                        opacity: pressed ? 0.7 : 1,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.legalPolicyBtnText, { color: colors.accent }]}>
+                      📜 服務條款 (Terms)
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -3136,5 +3195,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 32,
     fontWeight: '300',
+  },
+  legalPolicyBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  legalPolicyBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
