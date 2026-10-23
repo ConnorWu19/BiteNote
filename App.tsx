@@ -67,6 +67,7 @@ import { AuthModal } from './src/components/AuthModal';
 import { SplashScreen } from './src/components/SplashScreen';
 import { TasteMapTab } from './src/components/TasteMapTab';
 import { ProfileTab } from './src/components/ProfileTab';
+import { TimelineCalendar } from './src/components/TimelineCalendar';
 
 type MainTab = 'home' | 'map' | 'places' | 'evolution' | 'timeline' | 'profile';
 type VerdictFilter = 'all' | 'favorite' | 'price_up' | 'repeat' | TastingVerdict;
@@ -94,6 +95,8 @@ export default function App() {
   const [composerVisible, setComposerVisible] = useState<boolean>(false);
   const [composerTargetPlaceId, setComposerTargetPlaceId] = useState<string | undefined>(undefined);
   const [composerTargetDish, setComposerTargetDish] = useState<EnrichedDish | null>(null);
+  const [composerTargetVisitedAt, setComposerTargetVisitedAt] = useState<string | undefined>(undefined);
+  const [timelineViewMode, setTimelineViewMode] = useState<'stream' | 'calendar'>('stream');
   const [placeModalVisible, setPlaceModalVisible] = useState<boolean>(false);
   const [backupModalVisible, setBackupModalVisible] = useState<boolean>(false);
   const [authModalVisible, setAuthModalVisible] = useState<boolean>(false);
@@ -513,12 +516,21 @@ export default function App() {
   const openComposerForPlace = (placeId?: string) => {
     setComposerTargetDish(null);
     setComposerTargetPlaceId(placeId || activePlace?.id);
+    setComposerTargetVisitedAt(undefined);
     setComposerVisible(true);
   };
 
   const openComposerForDish = (dish: EnrichedDish) => {
     setComposerTargetPlaceId(dish.placeId);
     setComposerTargetDish(dish);
+    setComposerTargetVisitedAt(undefined);
+    setComposerVisible(true);
+  };
+
+  const openComposerForDate = (dateStr: string) => {
+    setComposerTargetDish(null);
+    setComposerTargetPlaceId(activePlace?.id);
+    setComposerTargetVisitedAt(dateStr);
     setComposerVisible(true);
   };
 
@@ -1637,40 +1649,111 @@ export default function App() {
          * ================================================================= */}
         {activeTab === 'timeline' && (
           <View style={styles.timelineTabContainer}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
-                個人飲食拍立得日記時間軸
-              </Text>
-              <Text style={[styles.sectionHeaderSub, { color: colors.inkSecondary }]}>
-                按日期倒序排列，重溫每一次用餐當下的照片、價格與真實感受
-              </Text>
-            </View>
+            <View style={styles.timelineHeaderRow}>
+              <View style={{ flex: 1, minWidth: 200, gap: 2 }}>
+                <Text style={[styles.sectionHeaderTitle, { color: colors.ink }]}>
+                  個人飲食拍立得日記
+                </Text>
+                <Text style={[styles.sectionHeaderSub, { color: colors.inkSecondary }]}>
+                  {timelineViewMode === 'stream'
+                    ? '按日期倒序排列，重溫每一次用餐當下的照片、價格與真實感受'
+                    : '手帳月曆模式，點選特定日期可聚焦檢視當日菜餚與心得'}
+                </Text>
+              </View>
 
-            <View style={styles.polaroidGrid}>
-              {timelineEntries.map(({ log, dish, visitIndex, prevPrice }) => {
-                const vMeta = VERDICT_OPTIONS[log.verdict];
-                const fMeta =
-                  PHOTO_FILTERS.find((f) => f.id === log.photoFilter) || PHOTO_FILTERS[0];
-                const priceDiff =
-                  typeof prevPrice === 'number' ? log.price - prevPrice : 0;
-
-                return (
-                  <View
-                    key={log.id}
+              {/* 雙模式切換鈕：📸 照片流 ⇄ 📅 手帳日曆 */}
+              <View
+                style={[
+                  styles.viewModeToggleRow,
+                  { backgroundColor: colors.surfaceSubtle, borderColor: colors.border },
+                ]}
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="切換為拍立得照片流模式"
+                  onPress={() => setTimelineViewMode('stream')}
+                  style={[
+                    styles.viewModeToggleBtn,
+                    timelineViewMode === 'stream' && {
+                      backgroundColor: colors.ink,
+                    },
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.polaroidCard,
+                      styles.viewModeToggleText,
                       {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        color: timelineViewMode === 'stream' ? colors.canvas : colors.inkSecondary,
+                        fontWeight: timelineViewMode === 'stream' ? '800' : '600',
                       },
                     ]}
                   >
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={`點擊放大回味 ${dish.name} 照片`}
-                      onPress={() => openPhotoLightbox(dish, log)}
-                      style={styles.polaroidImageWrapper}
+                    📸 照片流
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="切換為手帳日曆模式"
+                  onPress={() => setTimelineViewMode('calendar')}
+                  style={[
+                    styles.viewModeToggleBtn,
+                    timelineViewMode === 'calendar' && {
+                      backgroundColor: colors.ink,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.viewModeToggleText,
+                      {
+                        color: timelineViewMode === 'calendar' ? colors.canvas : colors.inkSecondary,
+                        fontWeight: timelineViewMode === 'calendar' ? '800' : '600',
+                      },
+                    ]}
+                  >
+                    📅 手帳日曆
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* 視圖切換：手帳日曆模式 vs 經典拍立得網格 */}
+            {timelineViewMode === 'calendar' ? (
+              <TimelineCalendar
+                entries={timelineEntries}
+                colors={colors}
+                onOpenLightbox={openPhotoLightbox}
+                onNavigateToPlace={navigateToPlaceDetail}
+                onOpenComposerForDate={openComposerForDate}
+                isWideScreen={isWideScreen}
+              />
+            ) : (
+              <View style={styles.polaroidGrid}>
+                {timelineEntries.map(({ log, dish, visitIndex, prevPrice }) => {
+                  const vMeta = VERDICT_OPTIONS[log.verdict];
+                  const fMeta =
+                    PHOTO_FILTERS.find((f) => f.id === log.photoFilter) || PHOTO_FILTERS[0];
+                  const priceDiff =
+                    typeof prevPrice === 'number' ? log.price - prevPrice : 0;
+
+                  return (
+                    <View
+                      key={log.id}
+                      style={[
+                        styles.polaroidCard,
+                        {
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                        },
+                      ]}
                     >
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={`點擊放大回味 ${dish.name} 照片`}
+                        onPress={() => openPhotoLightbox(dish, log)}
+                        style={styles.polaroidImageWrapper}
+                      >
                         {log.photoUri ? (
                           <>
                             <Image
@@ -1791,7 +1874,8 @@ export default function App() {
                     </View>
                   );
                 })}
-            </View>
+              </View>
+            )}
 
             {/* 頁尾法律與隱私連結（Web 版與 App 底端均可常駐查閱） */}
             <View style={styles.appFooterContainer}>
@@ -1923,6 +2007,7 @@ export default function App() {
         places={enrichedPlaces}
         initialPlaceId={composerTargetPlaceId}
         initialDish={composerTargetDish}
+        initialVisitedAt={composerTargetVisitedAt}
         autoSaveToAlbum={settings.autoSaveToAlbum}
         onClose={() => setComposerVisible(false)}
         onSubmit={handleAddBite}
@@ -2879,6 +2964,32 @@ const styles = StyleSheet.create({
   },
   timelineTabContainer: {
     gap: SPACING.md,
+  },
+  timelineHeaderRow: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 4,
+  },
+  viewModeToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    padding: 3,
+    gap: 2,
+  },
+  viewModeToggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: RADIUS.pill,
+  },
+  viewModeToggleText: {
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
   polaroidGrid: {
     flexDirection: 'row',

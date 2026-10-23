@@ -77,6 +77,7 @@ interface BiteComposerModalProps {
   places: EnrichedPlace[];
   initialPlaceId?: string;
   initialDish?: EnrichedDish | null;
+  initialVisitedAt?: string;
   autoSaveToAlbum: boolean;
   onClose: () => void;
   onSubmit: (payload: NewBiteSubmission) => void;
@@ -125,6 +126,7 @@ export const BiteComposerModal: React.FC<BiteComposerModalProps> = ({
   places,
   initialPlaceId,
   initialDish,
+  initialVisitedAt,
   autoSaveToAlbum,
   onClose,
   onSubmit,
@@ -160,7 +162,7 @@ export const BiteComposerModal: React.FC<BiteComposerModalProps> = ({
     if (!visible) return;
     setErrorMsg('');
     const today = new Date().toISOString().slice(0, 10);
-    setVisitedAt(today);
+    setVisitedAt(initialVisitedAt || today);
 
     if (initialDish) {
       setSelectedPlaceId(initialDish.placeId);
