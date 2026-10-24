@@ -449,59 +449,53 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             ) : (
               /* 情境 B：尚未登入 / 訪客模式，呈現清爽無負擔之登入畫面 */
               <View style={styles.guestLoginSection}>
-                {/* 1. 品牌印章與報刊級標題 */}
+                {/* 1. 雜誌級品牌刊頭 (Editorial Masthead Lockup) */}
                 <View style={styles.brandHeader}>
-                  <View
-                    style={[
-                      styles.brandSealEmblem,
-                      { backgroundColor: colors.accent },
-                    ]}
-                  >
-                    <Text style={styles.brandSealEmblemText}>吃一口</Text>
+                  {/* 頂部微型期刊發行標記 (Kicker) */}
+                  <View style={styles.brandKickerRow}>
+                    <View style={[styles.brandKickerRule, { backgroundColor: colors.border }]} />
+                    <Text style={[styles.brandKickerText, { color: colors.inkMuted }]}>
+                      TASTE ARCHIVE · 味覺手帳
+                    </Text>
+                    <View style={[styles.brandKickerRule, { backgroundColor: colors.border }]} />
                   </View>
-                  <Text style={[styles.brandEditorialTitle, { color: colors.ink }]}>
-                    BiteNote
-                  </Text>
-                  <Text
-                    style={[styles.brandEditorialSubtitle, { color: colors.accent }]}
-                  >
+
+                  {/* 品牌主標題：BiteNote 與 吃一口 典雅字體雙璧並列 */}
+                  <View style={styles.brandTitleRow}>
+                    <Text style={[styles.brandTitleEn, { color: colors.ink }]}>
+                      BiteNote
+                    </Text>
+                    <Text style={[styles.brandTitleZh, { color: colors.accent }]}>
+                      吃一口
+                    </Text>
+                  </View>
+
+                  {/* 典雅副標與核心精神宣言 */}
+                  <Text style={[styles.brandEditorialSubtitle, { color: colors.inkSecondary }]}>
                     私密飲食與味覺演變手帳
                   </Text>
-                  <Text
-                    style={[
-                      styles.brandEditorialManifesto,
-                      { color: colors.inkSecondary },
-                    ]}
-                  >
-                    不社交、不業配、不演算法 — 每一口，只向自己的真實舌尖交代。
+                  <Text style={[styles.brandEditorialManifesto, { color: colors.inkMuted }]}>
+                    不社交 · 不業配 · 不演算法 — 每一口，只向自己的真實舌尖交代
                   </Text>
                 </View>
-                {/* 2. 隨機飲食心語（每次開啟登入畫面自動更換，純淨展示不支援手動切換） */}
+
+                {/* 2. 隨機飲食心語（如手帳扉頁之題詞，隨機呈現，純淨不喧賓奪主） */}
                 <View
                   style={[
-                    styles.authDailyQuoteCard,
+                    styles.authEpigraphCard,
                     {
                       backgroundColor: colors.surfaceSubtle,
                       borderColor: colors.border,
+                      borderLeftColor: colors.accent,
                     },
                   ]}
                 >
-                  <View
-                    style={[
-                      styles.authDailyQuoteStamp,
-                      { backgroundColor: colors.accent },
-                    ]}
-                  >
-                    <Text style={styles.authDailyQuoteStampText}>心語</Text>
-                  </View>
-                  <View style={styles.authDailyQuoteContent}>
-                    <Text style={[styles.authDailyQuoteTitle, { color: colors.ink }]}>
-                      {randomQuote}
-                    </Text>
-                    <Text style={[styles.authDailyQuoteSubtitle, { color: colors.inkMuted }]}>
-                      ✦ 每日味覺手札
-                    </Text>
-                  </View>
+                  <Text style={[styles.authEpigraphQuote, { color: colors.ink }]}>
+                    「{randomQuote}」
+                  </Text>
+                  <Text style={[styles.authEpigraphSubtitle, { color: colors.inkMuted }]}>
+                    ✦ 每日隨想 · 舌尖手札
+                  </Text>
                 </View>
 
                 {/* 3. 輕量三保證徽章（清爽無負擔承諾） */}
@@ -987,56 +981,90 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xs,
   },
 
-  // 品牌 Masthead
+  // 雜誌級品牌 Masthead
   brandHeader: {
     alignItems: 'center',
     marginTop: SPACING.xs,
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.sm + 4,
   },
-  brandSealEmblem: {
-    width: 52,
-    height: 52,
-    borderRadius: RADIUS.md,
-    justifyContent: 'center',
+  brandKickerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#D14830',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
-        shadowRadius: 8,
-      },
-      default: {},
-    }),
+    width: '100%',
+    maxWidth: 240,
+    gap: SPACING.xs,
+    marginBottom: 6,
   },
-  brandSealEmblemText: {
-    color: '#FFFFFF',
-    fontFamily: FONTS.serif,
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+  brandKickerRule: {
+    flex: 1,
+    height: 1,
   },
-  brandEditorialTitle: {
+  brandKickerText: {
+    fontFamily: FONTS.mono,
+    fontSize: 10,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+  },
+  brandTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    marginBottom: 4,
+  },
+  brandTitleEn: {
     fontFamily: FONTS.serif,
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
-    letterSpacing: 0.5,
-    marginBottom: 2,
+    letterSpacing: -0.5,
+    lineHeight: 38,
+  },
+  brandTitleZh: {
+    fontFamily: FONTS.serif,
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: 2,
+    lineHeight: 28,
   },
   brandEditorialSubtitle: {
     fontFamily: FONTS.sans,
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    marginBottom: SPACING.xs,
+    fontSize: 12.5,
+    fontWeight: '600',
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
   brandEditorialManifesto: {
     fontFamily: FONTS.serif,
-    fontSize: 13,
+    fontSize: 12,
     textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 360,
+  },
+
+  // 扉頁題詞型飲食心語 (Editorial Epigraph)
+  authEpigraphCard: {
+    width: '100%',
+    paddingVertical: SPACING.sm + 2,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderLeftWidth: 3,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  authEpigraphQuote: {
+    fontFamily: FONTS.serif,
+    fontSize: 13,
+    fontStyle: 'italic',
     lineHeight: 20,
-    maxWidth: 340,
+    textAlign: 'center',
+    marginBottom: 3,
+  },
+  authEpigraphSubtitle: {
+    fontFamily: FONTS.mono,
+    fontSize: 10.5,
+    letterSpacing: 0.5,
   },
 
   // 保證微徽章列
@@ -1045,12 +1073,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: SPACING.xs,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
     flexWrap: 'wrap',
   },
   guaranteePill: {
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: RADIUS.pill,
     borderWidth: 1,
   },
@@ -1415,49 +1443,6 @@ const styles = StyleSheet.create({
   },
   guestLoginSection: {
     paddingTop: 2,
-  },
-  authDailyQuoteCard: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
-    gap: 10,
-  },
-  authDailyQuoteStamp: {
-    width: 32,
-    height: 32,
-    borderRadius: RADIUS.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  authDailyQuoteStampText: {
-    color: '#FFFFFF',
-    fontFamily: FONTS.serif,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  authDailyQuoteContent: {
-    flex: 1,
-    minWidth: 0,
-  },
-  authDailyQuoteTitle: {
-    fontFamily: FONTS.serif,
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 18,
-    marginBottom: 2,
-  },
-  authDailyQuoteSubtitle: {
-    fontFamily: FONTS.mono,
-    fontSize: 10.5,
-    letterSpacing: 0.4,
   },
   avatarImg: {
     width: 44,
