@@ -181,45 +181,49 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             </View>
           </View>
 
-          {/* 中央主視覺：朱泥和紙印章 + 刊頭 Typography */}
+          {/* 中央主視覺：雜誌級品牌刊頭 (Editorial Masthead Lockup) */}
           <View style={styles.centerHeroSection}>
-            {/* 硃砂紅雙線印章徽標 */}
+            {/* 品牌刊頭主標：BiteNote 與 吃一口 典雅字體雙璧並列 */}
             <Animated.View
               style={[
-                styles.sealStampContainer,
-                {
-                  backgroundColor: colors.accent,
-                  opacity: stampOpacity,
-                },
+                styles.titleGroup,
+                { opacity: stampOpacity },
               ]}
             >
-              <View style={styles.sealInnerBorder}>
-                <Text style={styles.sealCharacter}>吃一口</Text>
-              </View>
-            </Animated.View>
-
-            {/* 報刊級大字標題 */}
-            <View style={styles.titleGroup}>
-              <Text style={[styles.mainBrandEn, { color: colors.ink }]}>
-                BiteNote
-              </Text>
-              <View style={styles.brandZhRow}>
+              <View style={styles.brandTitleRow}>
+                <Text style={[styles.mainBrandEn, { color: colors.ink }]}>
+                  BiteNote
+                </Text>
                 <Text style={[styles.mainBrandZh, { color: colors.accent }]}>
                   吃一口
                 </Text>
-                <Text style={[styles.brandZhDot, { color: colors.inkMuted }]}>
-                  ・
-                </Text>
-                <Text style={[styles.mainBrandCategory, { color: colors.inkSecondary }]}>
-                  味覺演變手帳
-                </Text>
               </View>
-            </View>
+              <Text style={[styles.mainBrandCategory, { color: colors.inkSecondary }]}>
+                私密飲食與味覺演變手帳
+              </Text>
+              <Text style={[styles.mainBrandManifesto, { color: colors.inkMuted }]}>
+                每一口，只向自己的真實舌尖交代
+              </Text>
+            </Animated.View>
 
-            {/* 溫暖的飲食心語 */}
-            <Text style={[styles.quoteText, { color: colors.inkSecondary }]}>
-              {quote}
-            </Text>
+            {/* 溫暖的飲食心語題詞卡片 */}
+            <View
+              style={[
+                styles.quoteCard,
+                {
+                  backgroundColor: colors.surfaceSubtle,
+                  borderColor: colors.border,
+                  borderLeftColor: colors.accent,
+                },
+              ]}
+            >
+              <Text style={[styles.quoteText, { color: colors.ink }]}>
+                「{quote}」
+              </Text>
+              <Text style={[styles.quoteAuthor, { color: colors.inkMuted }]}>
+                ✦ 每日隨想 · 舌尖手札
+              </Text>
+            </View>
 
             {/* 極簡微型載入指示器與進度條 */}
             <View style={styles.progressSection}>
@@ -332,80 +336,57 @@ const styles = StyleSheet.create({
   centerHeroSection: {
     alignItems: 'center',
     width: '100%',
-    maxWidth: 400,
-    marginTop: -SPACING.lg,
-  },
-  sealStampContainer: {
-    width: 76,
-    height: 76,
-    borderRadius: RADIUS.md,
-    padding: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#D14830',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.32,
-        shadowRadius: 16,
-      },
-      android: {
-        elevation: 6,
-      },
-      default: {
-        boxShadow: '0 8px 24px rgba(209, 72, 48, 0.28)',
-      },
-    }),
-  },
-  sealInnerBorder: {
-    width: '100%',
-    height: '100%',
-    borderRadius: RADIUS.sm,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.75)',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sealCharacter: {
-    color: '#FFFFFF',
-    fontFamily: FONTS.serif,
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: 2.5,
+    maxWidth: 440,
+    marginTop: -SPACING.md,
   },
   titleGroup: {
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  brandTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: SPACING.sm + 2,
+    marginBottom: 6,
   },
   mainBrandEn: {
     fontFamily: FONTS.serif,
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 4,
-  },
-  brandZhRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    letterSpacing: -0.5,
+    lineHeight: 48,
   },
   mainBrandZh: {
     fontFamily: FONTS.serif,
-    fontSize: 17,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-  },
-  brandZhDot: {
-    fontSize: 14,
+    fontSize: 24,
     fontWeight: '700',
+    letterSpacing: 2.5,
+    lineHeight: 34,
   },
   mainBrandCategory: {
     fontFamily: FONTS.sans,
     fontSize: 14,
     fontWeight: '600',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  mainBrandManifesto: {
+    fontFamily: FONTS.serif,
+    fontSize: 12.5,
+    textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 340,
+  },
+  quoteCard: {
+    width: '100%',
+    paddingVertical: SPACING.sm + 4,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderLeftWidth: 3,
+    marginBottom: SPACING.lg,
+    alignItems: 'center',
   },
   quoteText: {
     fontFamily: FONTS.serif,
@@ -413,8 +394,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: SPACING.lg,
-    paddingHorizontal: SPACING.md,
+    marginBottom: 4,
+  },
+  quoteAuthor: {
+    fontFamily: FONTS.mono,
+    fontSize: 11,
+    letterSpacing: 0.6,
   },
 
   // 髮絲紋進度條
